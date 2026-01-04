@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+
+<html>
+    
+    <title>Homepage </title>
+<body>
+
+    <h1>Welcome!</h1>
+
+<form method="POST" action="">
+    {{ form.hidden_tag() }}
+    <div>Username: {{ form.username }}</div>
+    <br>
+    <div>Password: {{ form.password }}</div>
+    <br>
+    <div>{{ form.submit }}</div>
+</form>
+
+</body>
+</html>

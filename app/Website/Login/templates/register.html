@@ -1,0 +1,46 @@
+<html>
+
+<title>Register</title>
+<body>
+    <h1>Register</h1>
+    <div>
+    <form method="POST" action="">
+        {{ form.hidden_tag() }}
+        <div>Username: {{ form.username }}</div>
+        <br>
+        <div>Password: {{ form.password }}</div>
+        <br>
+        <div>{{ form.submit }}</div>
+    </form>
+    </div>
+
+    <dialog id="password_mismatch">
+        <p>Password does not match!</p>
+        <button onclick=closeMismatchDialog()>Confirm</button>
+    </dialog>
+</body>
+
+<script>
+const dialog_miss = document.getElementById("password_mismatch")
+
+function showMismatchDialog(){
+    dialog_miss.showModal()
+}
+function closeMismatchDialog(){
+    dialog_miss.close()
+}
+</script>
+{% block content %}
+    {%with messages = get_flashed_messages(with_categories=true)%}
+        {%if messages%}
+            {% for category, msg in messages %}
+                {% if category == "password_mismatch" %}
+                    <script>
+                        showMismatchDialog()
+                    </script>
+                {%endif%}
+            {%endfor%}
+        {%endif%}
+    {%endwith%}
+{%endblock%}
+</html>

@@ -1,0 +1,46 @@
+<html>
+    <title>Create Assignment</title>
+    <h1>Create Assignment</h1>
+    <div>
+        <form method="POST" action="">
+            {{ form.hidden_tag() }}
+            <p>Course Name: {{form.course_name}} </p>
+            <p>Title: {{form.title}} </p>
+            <p>Description: {{form.description}} </p>
+            <p>Due Date: {{form.due}} </p>
+            <p>Points Available: {{form.points}} </p>
+            <p>{{form.submit}}</p>
+        </form>
+    </div>
+    <div>
+        <dialog id="created">
+        <p>Assignment created successfully!</p>
+        <button onclick=closeCreateDialog()>Confirm</button>
+    </div>
+    </dialog>
+
+    <script>
+    const dialog_create = document.getElementById("created")
+
+    function showCreateDialog(){
+        dialog_create.showModal()
+    }
+    function closeCreateDialog(){
+        dialog_create.close()
+    }
+</script>
+
+{% block content %}
+    {%with messages = get_flashed_messages(with_categories=true)%}
+        {%if messages%}
+            {% for category, msg in messages %}
+                {% if category == "created" %}
+                    <script>
+                        showCreateDialog()
+                    </script>
+                {%endif%}
+            {%endfor%}
+        {%endif%}
+    {%endwith%}
+{%endblock%}
+</html>
