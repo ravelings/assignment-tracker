@@ -8,6 +8,8 @@ class User(UserMixin, db.Model):
     username = db.Column("username", db.String(50), nullable=False, unique=True)
     hash = db.Column("hash", db.String(255))
 
+    canvas_token = db.Column("canvas_token", db.String(255), nullable=True)
+
     def __init__(self, username, hash):
         self.username   = username
         self.hash       = hash

@@ -1,7 +1,9 @@
 from flask import render_template, Blueprint, flash, redirect, url_for
 from flask_login import login_required, current_user
 from forms.assignment import AssignmentCreateForm
+from forms.addTokenForm import AddTokenForm
 from repositories.assignmentRepo import AssignmentRepo
+from repositories.userRepo import UserRepo
 
 assignments_bp = Blueprint("assignments", __name__, static_folder="static", template_folder="templates")
 
@@ -34,3 +36,21 @@ def createAssignment():
         return redirect(url_for("assignments.createAssignment"))
 
     return render_template("addAssignment.html", form=form)
+
+@assignments_bp.route("/addCanvasToken/", methods=["POST", "GET"])
+@login_required
+def addCanvasToken():
+    form = AddTokenForm()
+    if form.validate_on_submit:
+        repo = UserRepo()
+        token = form.token.data
+        set = repo.setCanvasToken(user_id=current_user.user_id, token=token)
+
+        if set:
+            flash("Token set successfully!", category="token")
+            redirect(url_for("assignments.addCanvasToken"))
+        else:
+            flash("Token set failed.", category="token")
+            redirect(url_for("assignments.addCanvasToken"))
+    
+    return render_template("setCanvasToken.jinja2", form=form)

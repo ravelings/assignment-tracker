@@ -41,3 +41,20 @@ class UserRepo:
             return user
         else:
             return None
+
+    def setCanvasToken(self, user_id, token):
+        user = User.query.filter_by(user_id=user_id).first()
+
+        if user is None:
+            return False 
+        
+        user.canvas_token = token 
+        self.commit()
+
+        return True
+    
+    def getCanvasToken(self, user_id):
+        
+        token = (User.query.filter_by(user_id=user_id).first()).canvas_token
+        
+        return token

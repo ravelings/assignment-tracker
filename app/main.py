@@ -3,6 +3,7 @@ from extensions.extensions import db, loginManager
 from Website.Login.login import login_bp
 from Website.MainPage.mainPage import mainPage_bp
 from Website.Assignments.assignmentManager import assignments_bp
+from Website.Courses.courseManager import courses_bp
 
 app = Flask(__name__)
 # DB config
@@ -18,6 +19,8 @@ app.register_blueprint(login_bp, url_prefix="")
 app.register_blueprint(mainPage_bp, url_prefix="")
 ## assignment
 app.register_blueprint(assignments_bp, url_prefix="")
+## course
+app.register_blueprint(courses_bp, url_prefix="")
 # secret
 app.secret_key = "12345"
 
