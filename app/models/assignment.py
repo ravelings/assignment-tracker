@@ -20,6 +20,7 @@ class Assignment(db.Model):
     updated = db.Column("updated", db.Text, nullable=True)
 
     points_possible = db.Column("points_possible", db.Integer, nullable=True)
+    score = db.Column("score", db.Float, nullable=True)  # Actual score achieved
     canvas_assignment_id = db.Column("canvas_assignment_id", db.Integer, nullable=True)
     canvas_course_id = db.Column("canvas_course_id", db.Integer, db.ForeignKey("courses.canvas_course_id"), nullable=True)
     
@@ -29,6 +30,7 @@ class Assignment(db.Model):
     submission_type = db.Column("submission_type", db.Text, nullable=True)
     canvas_base_url = db.Column("canvas_base_url", db.Text, nullable=True)
     last_canvas_sync = db.Column("last_canvas_sync", db.Text, nullable=True)
+    effort = db.Column("effort", db.Integer, nullable=True, default=1) # 1=Low, 2=Med, 3=High
 
     def __init__(
         self,
@@ -44,11 +46,13 @@ class Assignment(db.Model):
         created=None,
         updated=None,
         points_possible=None,
+        score=None,
         unlock_at=None,
         html_url=None,
         submission_type=None,
         canvas_base_url=None,
-        last_canvas_sync=None
+        last_canvas_sync=None,
+        effort=1
     ):
         self.user_id = user_id
         self.course_id = course_id
@@ -59,6 +63,7 @@ class Assignment(db.Model):
         self.created = created
         self.updated = updated
         self.points_possible = points_possible
+        self.score = score
         self.canvas_assignment_id = canvas_assignment_id
         self.canvas_course_id = canvas_course_id
         self.workflow_state = workflow_state
@@ -67,3 +72,4 @@ class Assignment(db.Model):
         self.submission_type = submission_type
         self.canvas_base_url = canvas_base_url
         self.last_canvas_sync = last_canvas_sync
+        self.effort = effort

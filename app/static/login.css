@@ -1,0 +1,61 @@
+
+.container, .main-box {
+    font-family: "Red Hat Display", sans-serif; 
+    font-weight: 400;
+    font-style: normal;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    gap: 1rem;
+    background-image: linear-gradient(black, white);
+}
+
+.main-box {
+    height: 30rem;
+    width: 20rem;
+    max-width: 90vh;
+    border: 5px solid #202020;
+}
+
+.form-group {
+    position: relative;
+    width: 15rem;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-group input[type="text"], .form-group input[type="password"] {
+    width: 100%;
+    border-radius: 1rem;
+    padding: 0.5rem;
+    text-decoration: none;
+    border: 2px solid #dfe1e5;
+    outline: none;
+    gap: 1rem;
+    padding-left: 2.5rem;
+}
+
+.form-group input[type="submit"] {
+    width: 100%;
+    padding: 0.5rem; 
+    border-radius: 1rem;
+    outline: none;
+    background: #202020;
+    color: #e3e3e3;
+}
+
+.form-img {
+    width: 1.5rem;
+    height: 1.5rem;
+    left: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    position: absolute;
+}
+
+h1 {
+    gap: 1rem;
+}

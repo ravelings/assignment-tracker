@@ -23,6 +23,8 @@ def createAssignment():
         description = form.description.data 
         due = form.due.data 
         points = form.points.data 
+        effort = form.effort.data
+        status = form.status.data
 
         repo.createAssignment(
             user_id=user_id,
@@ -30,7 +32,9 @@ def createAssignment():
             title=title,
             desc=description,
             due=due,
-            points=points
+            points=points,
+            effort=effort,
+            status=status
         )
         flash("Assignment created successfully!", "created")
         return redirect(url_for("assignments.createAssignment"))

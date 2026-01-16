@@ -11,7 +11,7 @@ class AssignmentRepo:
     def commit(self):
         db.session.commit()
 
-    def createAssignment(self, user_id, course_name, title, desc=None, due=None, points=None):
+    def createAssignment(self, user_id, course_name, title, desc=None, due=None, points=None, effort=1, status=0):
         created = date.today().isoformat()
 
         course = self.courseRepo.getCourseByName(user_id, course_name)
@@ -27,11 +27,12 @@ class AssignmentRepo:
             title=title,
             description=desc,
             due=due,
-            status=0,
+            status=status,
             created=created,
             updated=created,
-            points=points,
-            canvas_assignment_id=None
+            points_possible=points,
+            canvas_assignment_id=None,
+            effort=effort
         )
 
         db.session.add(assignment)
@@ -60,6 +61,19 @@ class AssignmentRepo:
             db.session.add(canvasAssignment)
 
         self.commit()
+
+    def getAllAssignmentsByCourseId(self, user_id, course_id):
+        return Assignment.query.filter_by(user_id=user_id, course_id=course_id).all()
+
+    def deleteAllAssignmentsByCourseId(self, user_id, course_id):
+        with db.session.no_autoflush:
+            assignments = Assignment.query.filter_by(user_id=user_id, course_id=course_id).all()
+            if assignments:
+                for assignment in assignments:
+                    db.session.delete(assignment)
+                self.commit()
+                return True
+            return False
 
     def getAllAssignmentById(self, user_id):
         # returns a list of all assignments
@@ -112,4 +126,42 @@ class AssignmentRepo:
             db.session.delete(assignment)
             self.commit()
             return True
+    
+    def updateScore(self, user_id, assignment_id, score):
+        """Update the score for a specific assignment"""
+        assignment = self.getAssignmentById(user_id, assignment_id)
+        
+        if assignment is None:
+            return False
+        
+        assignment.score = score
+        assignment.updated = date.today().isoformat()
+        self.commit()
+        return True
+    
+    def getScore(self, user_id, assignment_id):
+        """Retrieve the score for a specific assignment"""
+        assignment = self.getAssignmentById(user_id, assignment_id)
+        
+        if assignment is None:
+            return None
+        
+        return assignment.score
+    
+    def getAllScores(self, user_id):
+        """Retrieve all assignments with their scores for a user"""
+        assignments = self.getAllAssignmentById(user_id)
+        
+        scores_data = []
+        for assignment in assignments:
+            scores_data.append({
+                'assignment_id': assignment.assignment_id,
+                'title': assignment.title,
+                'course_name': assignment.course.course_name if assignment.course else None,
+                'points_possible': assignment.points_possible,
+                'score': assignment.score,
+                'due': assignment.due
+            })
+        
+        return scores_data
 

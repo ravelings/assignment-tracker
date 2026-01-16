@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, StringField, TextAreaField, DateField, SubmitField
+from wtforms import IntegerField, StringField, TextAreaField, DateField, SubmitField, SelectField
 from wtforms.validators import InputRequired, Optional, Length, NumberRange
 
 class AssignmentCreateForm(FlaskForm):
@@ -27,6 +27,22 @@ class AssignmentCreateForm(FlaskForm):
     points = IntegerField(
         validators=[Optional(), NumberRange(min=0)],
         render_kw={"placeholder": "Points (optional)"}
+    )
+
+    effort = SelectField(
+        "Effort",
+        choices=[(1, "Low"), (2, "Medium"), (3, "High")],
+        coerce=int,
+        validators=[Optional()],
+        default=1
+    )
+
+    status = SelectField(
+        "Status",
+        choices=[(0, "Pending"), (1, "In Progress"), (2, "Finished")],
+        coerce=int,
+        validators=[Optional()],
+        default=0
     )
 
     submit = SubmitField("Create Assignment")

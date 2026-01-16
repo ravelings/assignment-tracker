@@ -1,10 +1,12 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for, jsonify
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, logout_user
 from repositories.userRepo import UserRepo
 from repositories.assignmentRepo import AssignmentRepo
 from repositories.courseRepo import CourseRepo
 from integrations.canvasClient import CanvasClient
 from forms.DeleteAssignment import DeleteAssignment
+from services.scoring_service import ScoringService
+from forms.SubmitForm import SubmitForm
 
 mainPage_bp = Blueprint("mainPage", __name__, static_folder="static", template_folder="templates")
 
@@ -22,10 +24,20 @@ def dashboard():
     "default"   : repo.getAllAssignmentById,
     "course"      : repo.get_SortedByName_Assignment,
     "due"       : repo.get_SortedByDue_Assignment,
-    "points"    : repo.get_SortedByPoints_Assignment
+    "points"    : repo.get_SortedByPoints_Assignment,
+    "priority"  : repo.getAllAssignmentById # Sort manually after calculation
     }
 
-    assignments = SORT_MAP.get(sort_key)(user_id)
+    assignments = SORT_MAP.get(sort_key, repo.getAllAssignmentById)(user_id)
+    
+    # Calculate scores
+    scoring_service = ScoringService(user_id)
+    for assignment in assignments:
+        # assignment.course is available via relationship
+        assignment.priority_score = scoring_service.calculate_score(assignment, assignment.course)
+
+    if sort_key == "priority":
+        assignments.sort(key=lambda x: x.priority_score, reverse=True)
 
     if deleteForm.validate_on_submit:
         print(f"Assignment ID: {deleteForm.assignment_id.data}")
@@ -35,7 +47,15 @@ def dashboard():
 @mainPage_bp.route("/userinfo/")
 @login_required
 def userInfo():
-    return render_template("userInfo.html", user=current_user)
+    submitForm = SubmitForm()
+    return render_template("userInfo.html", user=current_user, submitForm=submitForm)
+
+@mainPage_bp.route("/dashboard/logout/", methods=["POST"])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login.login"))
+
 
 @mainPage_bp.route("/dashboard/assignments/delete/<int:assignment_id>/", methods=["POST"])
 @login_required
@@ -77,6 +97,6 @@ def syncAssignments():
         assignments = client.getAssignmentsByCourse(user_id=current_user.user_id, course=course)
         if assignments is None:
             continue 
-        assignmentRepo. (assignments)
+        assignmentRepo.createCanvasAssignment(assignments)
     
     return jsonify({"status": "success"})

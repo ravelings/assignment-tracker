@@ -59,15 +59,23 @@ class Course(db.Model):
         nullable=True
     )
 
+    weight = db.Column(
+        "weight",
+        db.Float,
+        default=1.0,
+        nullable=False
+    )
+
     def __init__(
         self,
         user_id: int,
         course_name: str,
-        canvas_course_id: int | None,
-        workflow_state: str | None,
-        time_zone: str | None,
-        last_sync: str | None,
-        canvas_base_url: str | None,
+        canvas_course_id = None,
+        workflow_state = None,
+        time_zone = None,
+        last_sync = None,
+        canvas_base_url = None,
+        weight: float = 1.0
     ):
         self.user_id = user_id
         self.course_name = course_name
@@ -76,5 +84,6 @@ class Course(db.Model):
         self.time_zone = time_zone
         self.last_sync = last_sync
         self.canvas_base_url = canvas_base_url
+        self.weight = weight
 
         
