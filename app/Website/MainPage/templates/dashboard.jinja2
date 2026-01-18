@@ -1,93 +1,117 @@
-<!doctype html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="" />
-    <title>Document</title>
+{% block content %}
+    <head>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dashboard.css') }}">
+        <title>Osmos Tracker</title>
+    </head>
+    
+    <h1>Active Assignments</h1>
 
-    <!-- Bootstrap CSS (v4.3.1) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
-</head>
+    <div class="container">
+        
+        <div class="card-div">
+            <div class="card">
+                <p class="card-header1">Pending Tasks</p>
+                <p class="card-number">12</p>
+                <div class="tally">
+                    <p class="card-tally-pending">+2 this week</p>
+                </div>
+            </div>
 
-<title> Dashboard </title>
+            <div class="card">
+                <p class="card-header1">Completed</p>
+                <p class="card-number">45</p>
+                <div class="tally">
+                    <p class="card-tally-completed">+1 today</p>
+                </div>
+            </div>
 
-<body>
-
-    <h1>Dashboard</h1>
-
-    <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
-            aria-haspopup="true" aria-expanded="false">
-            Sort by
-        </button>
-
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <a class="dropdown-item" href="?sort=due">Due</a>
-            <a class="dropdown-item" href="?sort=course">Course</a>
-            <a class="dropdown-item" href="?sort=points">Points</a>
-            <a class="dropdown-item" href="?sort=priority">Priority</a>
+            <div class="card">
+                <p class="card-header1">Pending Tasks</p>
+                <p class="card-number">12</p>
+                <div class="tally">
+                    <p class="card-tally-due">+2 this week</p>
+                </div>
+            </div>
         </div>
+    
+        <div class="table-div">
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="?sort=due">Due</a>
+                    <a class="dropdown-item" href="?sort=course">Course</a>
+                    <a class="dropdown-item" href="?sort=points">Points</a>
+                    <a class="dropdown-item" href="?sort=priority">Priority</a>
+                </div>
+            </div>
+
+            <table class="assignment-table">
+                <tr>
+                    <th>Assignment Name</th>
+                    <th>Course</th>
+                    <th>Due Date</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                </tr>
+
+                {% for assignment in assignments %}
+                    <tr>
+                        <td class="title">{{assignment.title}}</td>
+                        <td><a class="course-name">{{assignment.course.course_name}}</a></td>
+                        <td>{{assignment.due}}</td>
+                        <td class="priority">{{"%.2f"|format(assignment.priority_score)}}</td>
+                        <td class="status">{{assignment.status}}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td>test1</td>
+                    <td><a class="course-name">Macroeconomics</a></td>
+                    <td>test3</td>
+                    <td>test4</td>
+                    <td>test5</td>
+                </tr>
+            </table>
+        </div>
+
     </div>
+        
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                Sort by
+            </button>
+        </div>
 
-    {% for assignment in assignments %}
-    <h1>Assignment: {{assignment.title}}</h1>
-    <p>Assignment ID: {{assignment.assignment_id}} </p>
-    <p>Course: {{assignment.course.course_name}}</p>
-    <p>Description: {{assignment.description}}</p>
-    <p>Due: {{assignment.due}}</p>
-    <p>Possible Points: {{assignment.points}}</p>
-    <p>Status: {{assignment.status}}</p>
-    <p><strong>Priority Score: {{"%.2f"|format(assignment.priority_score)}}</strong></p>
-    <div>
-        <button id="deleteButton" onclick=confirmDeleteDialog() type="button" class="btn btn-danger"
-            data-assignment-id="{{ assignment.assignment_id }}">
-            Delete
-        </button>
-    </div>>
+        <div>
+            <button type="button" class="btn btn-primary" id="sync" onclick=sync()>
+                Sync Now
+            </button>
+        </div>
 
-    {% endfor %}
+        <p id="alert"></p>
 
-    <div>
-        <button type="button" class="btn btn-primary" id="sync" onclick=sync()>
-            Sync Now
-        </button>
+        <dialog id="confirmDeleteDialog">
+            <p>Are you sure you want to delete the assignment?</p>
+            <div>
+                <form id="deleteForm" method="POST">
+                    {{ deleteForm.submit }}
+                </form>
+            </div>
+            <div>
+                <button id="closeDialog" onclick=closeDialog(this)>Cancel</button>
+            </div>
+        </dialog>
+
+        <dialog id="deleteDialog">
+            <p id="deleteMessage"></p>
+            <div>
+                <button id="closeDialog" onclick=closeDialog(this)>Confirm</button>
+            </div>
+        </dialog>
     </div>
+{% endblock %}
 
-    <p id="alert"></p>
-
-    <dialog id="confirmDeleteDialog">
-        <p>Are you sure you want to delete the assignment?</p>
-        <div>
-            <form id="deleteForm" method="POST">
-                {{ deleteForm.submit }}
-            </form>
-        </div>
-        <div>
-            <button id="closeDialog" onclick=closeDialog(this)>Cancel</button>
-        </div>
-    </dialog>
-
-    <dialog id="deleteDialog">
-        <p id="deleteMessage"></p>
-        <div>
-            <button id="closeDialog" onclick=closeDialog(this)>Confirm</button>
-        </div>
-    </dialog>
-    <!-- Bootstrap JS dependencies -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
-        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"></script>
-</body>
-
+{% block scripts %}
 <script>
 
     function confirmDeleteDialog() {
@@ -179,5 +203,5 @@
 {%endfor%}
 {%endif%}
 {%endwith%}
+{% endblock %}
 
-</html>

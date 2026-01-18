@@ -1,0 +1,160 @@
+:root{
+    --bg-dark: oklch(0.92 0.01 255);
+    --bg: oklch(0.96 0.01 255);
+    --bg-light: oklch(1 0.01 255);
+    --bg-header: oklch(0.98 0.01 255);
+    --text: oklch(0.15 0.02 255);
+    --text-muted: oklch(0.4 0.02 255);
+    --highlight: oklch(1 0.02 255);
+    --border: oklch(0.6 0.02 255);
+    --border-muted: oklch(0.7 0.02 255);
+    --primary: oklch(0.4 0.1 255);
+    --secondary: oklch(0.4 0.1 75);
+    --danger: oklch(0.5 0.05 30);
+    --warning: oklch(0.5 0.05 100);
+    --success: oklch(0.5 0.05 160);
+    --info: oklch(0.5 0.05 260);
+
+    --gradient: linear-gradient(0deg, var(--bg-dark) 95%, var(--bg-light));
+    --shadow: 0px 2px 2px hsla(0, 0%, 0%, 0.07), 0px 2.5px 2.5px hsla(0, 0%, 0%, 0.10)
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
+    width: 100vw;
+}
+
+body{
+    background-color: var(--bg-light);
+}
+
+a, a:hover {
+    text-decoration: none;
+}
+
+h1 {
+    display: flex;
+    justify-content: left;
+    padding-bottom: 2.5rem;
+}
+
+.table-div {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 1rem;
+}
+
+table, .assignment-table {
+    border-collapse: collapse;
+
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--bg-dark);
+    border-radius: 12px;
+
+    border-spacing: 0;
+    overflow: hidden;
+}
+
+th {
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    color: var(--text);
+    background-color: var(--bg-header);
+    color: var(--text-muted);
+    text-align: left;
+}
+
+td {
+    color: var(--text-muted);
+}
+
+th, td {
+    border: none;
+    padding: 1rem;
+}
+
+.course-name {
+    padding: 0.25rem;
+    border: 0.1rem solid #bebebe;
+    background-color: var(--bg-header);
+    color: var(--text-muted);
+    border-radius: 0.25rem;
+    font-size: small;
+}
+
+.card-div{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+
+    justify-content: space-between;
+    gap: 1rem;
+
+}
+
+.card {
+    border: 1px solid var(--bg);
+    background-color: var(--bg-light);
+    box-shadow: var(--shadow);
+    
+    display:flex; 
+
+    width: 20rem;
+    height: 8rem;
+    padding-left: 2.5rem;
+    padding-top: 1.25rem;
+    padding-right: 2rem;
+}
+
+.card-header1 {
+    display: flex;
+    align-items: center;
+    font-size: large;
+    margin: 0.15rem;
+}
+
+.card-number {
+    position: relative;
+    display: flex;
+    align-items: center;
+    font-size: xx-large;
+    font-weight: bold;
+    margin: 0.15rem;
+}
+
+.tally {
+    display: flex;
+    justify-content: right;
+
+    transform: translateY(-95%);
+}
+
+.card-tally-pending, .card-tally-completed, .card-tally-due {
+    padding: 0.25rem;
+    font-size: large;
+    
+}
+
+.card-tally-pending{
+    color: #1a6d89;
+    background-color: #e1ebf0;
+
+    border-color: var(--bg-light);
+    border-radius: 0.5rem;
+}
+
+.card-tally-completed{
+    color: #0cb77e;
+    background-color: #e0f3ef;
+
+    border-color: var(--bg-light);
+    border-radius: 0.5rem;
+}

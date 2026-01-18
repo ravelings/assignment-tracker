@@ -1,0 +1,6 @@
+            <p><strong>Priority Score: {{"%.2f"|format(assignment.priority_score)}}</strong></p>
+            <div class="assignment-btn">
+                <button id="deleteButton" onclick=confirmDeleteDialog() type="button" class="btn btn-danger"
+                    data-assignment-id="{{ assignment.assignment_id }}">
+                    Delete
+                </button>

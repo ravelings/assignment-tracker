@@ -1,6 +1,9 @@
+a:link, a:visited, a:hover, a:active {
+    text-decoration: none;
+}
 
 .container, .main-box {
-    font-family: "Red Hat Display", sans-serif; 
+    font-family: "Manrope", sans-serif; 
     font-weight: 400;
     font-style: normal;
     display: flex;
@@ -9,14 +12,18 @@
     align-items: center;
     height: 100vh;
     gap: 1rem;
-    background-image: linear-gradient(black, white);
 }
 
 .main-box {
     height: 30rem;
-    width: 20rem;
+    bottom: -10px;
+    width: 25rem;
     max-width: 90vh;
-    border: 5px solid #202020;
+    background: transparent;
+    backdrop-filter: blur(10px);
+    border-radius: 2rem;
+    box-shadow:
+    0rem 0rem 1rem #bebebe
 }
 
 .form-group {
@@ -38,24 +45,81 @@
     padding-left: 2.5rem;
 }
 
-.form-group input[type="submit"] {
+.btn-submit {
+    outline: none;
     width: 100%;
     padding: 0.5rem; 
     border-radius: 1rem;
-    outline: none;
-    background: #202020;
-    color: #e3e3e3;
+    background: transparent;
+    border: 3px solid #200202;
+    color: #202020;
+    position: relative;
+}
+
+.btn-submit::after {
+    content: "";
+    position: absolute;
+    border-radius: 0.5rem;
+    width: 0rem;
+    height: 105%;
+    top: 0;
+    left: 0rem;
+    background-color: #200202;
+    transition: width 0.3s ease;
+    z-index: -1;
+}
+
+.btn-submit:hover::after {
+  width: 100%;
+}
+
+.btn-submit:hover {
+  color: white;
+}
+
+.logo {
+    width: 10rem;
+    height: 10rem;
+    transform: translateY(-120%);
+    position: absolute
 }
 
 .form-img {
-    width: 1.5rem;
-    height: 1.5rem;
+    width: 1.25rem;
+    height: 1.25rem;
     left: 0.75rem;
     top: 50%;
     transform: translateY(-50%);
     position: absolute;
+    filter: invert(45%);
 }
 
 h1 {
     gap: 1rem;
+    font-weight: bold;
+    font-size: x-large;
+}
+
+.create-account {
+    display: flex;
+    gap: 0.25rem;
+    font-size: smaller;
+}
+
+.text2{
+    display: flex;
+    align-items: center;
+    color:#747474;
+}
+
+.hyperlink{
+    display: flex;
+    min-width: 5rem;
+    text-decoration: none;
+    color:#202020;
+}
+
+.hyperlink:hover {
+    color:#202020;
+    font-weight: bold;
 }

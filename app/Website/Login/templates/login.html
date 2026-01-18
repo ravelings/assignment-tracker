@@ -7,44 +7,49 @@
     <meta name="description" content="" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
     <!-- Bootstrap CSS (v4.3.1) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
     <title>Login</title>
-    <link href="./static/src/output.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}">
 </head>
 
 <body>
     <div class="container">
         <div class="main-box">
 
-            <h1 id="title">Login</h1>
-            
+            <img class="logo" 
+            src="{{ url_for('static', filename='/images/login/OsmoLogo.svg') }}">
+
+            <h1 id="title">Login to Osmo</h1>
+
             <form method="POST" action="">
                 {{ form.hidden_tag() }}
-                
+
                 <div class="form-group">
-                    <img 
-                    class="form-img" 
-                    src="{{ url_for('static', filename='/images/login/user_icon.svg') }}"
-                    >
+                    <img class="form-img" src="{{ url_for('static', filename='/images/login/user_icon.svg') }}">
                     {{ form.username }}
-                    
+
                 </div>
-                
+
                 <div class="form-group">
-                    <img 
-                    class="form-img" 
-                    src="{{ url_for('static', filename='/images/login/password_icon.svg') }}"
-                    >
+                    <img class="form-img" src="{{ url_for('static', filename='/images/login/password_icon.svg') }}">
                     {{ form.password }}
                 </div>
 
                 <div class="form-group">
-                    {{ form.submit }}
+                    <button type="submit" name="{{form.submit.name}}" value="1" class="btn-submit"
+                    {{ form.submit.label.text }}>Login</button>
                 </div>
             </form>
+            <div class="create-account">
+                <p class="text2">Don't have an account?</p>
+                <a href="{{ url_for('login.register') }}" class="hyperlink">Create an Account</a>
+            </div>
         </div>
     </div>
     <!-- Bootstrap JS dependencies -->

@@ -100,3 +100,7 @@ def syncAssignments():
         assignmentRepo.createCanvasAssignment(assignments)
     
     return jsonify({"status": "success"})
+
+@mainPage_bp.route("/test", methods=["GET"])
+def test():
+    return render_template("base.html")

@@ -1,0 +1,155 @@
+:root{
+    --shadow: 2px 2px 2px hsla(0, 0%, 0%, 0.07), 2px 2.5px 2.5px hsla(0, 0%, 0%, 0.10)
+
+    --bg-dark: oklch(0.92 0.01 255);
+    --bg: oklch(0.96 0.01 255);
+    --bg-light: oklch(1 0.01 255);
+}
+
+.container, .assignment {
+    display: flex;
+    flex-direction: column;
+}
+
+.wrapper {
+    display: flex;
+    position:relative;
+    width: 100%;
+    font-family: "Manrope", sans-serif; 
+}
+
+.sidebar-div {
+    height: 100vh;
+}
+
+.item {
+    display: flex; 
+    flex-direction: column;
+    justify-content: center;
+}
+
+.sidebar {
+    width: 20rem;
+    background-color: #1A1A1A;
+    list-style: none;
+    margin: 0;
+    padding-left: 2.5rem;
+    box-shadow: var(--shadow);
+    border-right: 1px solid var(--bg-dark);
+
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    height: 100%;
+}
+
+.main-content {
+    flex: 1;
+    padding: 2rem;
+}
+
+.sidebar-link {
+    display: flex;
+    flex-direction: row;
+    font-size: large;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+
+    padding: 0.5rem;
+    padding-right: 0rem;
+}
+
+.sidebar-link{
+    padding: 1rem;
+    width: 15rem;
+}
+
+.sidebar-link {
+    border-radius: 0.5rem;
+    transition: background-color 0.35s ease-in-out, 
+                border-radius 0.35s ease-in-out;
+}
+
+.sidebar-link .text1,
+.sidebar-link .nav-img {
+  transition: color 0.35s ease-in-out, filter 0.35s ease-in-out;
+}
+
+.sidebar-link:hover{
+    border-radius: 0.5rem;
+    background-color: #ebeced1a;
+}
+
+.sidebar-link:hover .text1{
+ color:#ebeced;
+
+}
+
+.sidebar-link:hover .nav-img{
+    filter: invert(75%);
+}
+
+a {
+  text-decoration: none;
+}
+
+.create-tab {
+    display: flex;
+    align-self: center;
+    margin-top: auto; 
+    margin-bottom: 10rem;
+    margin-right: 2.75rem;
+    position: relative;
+}
+
+.create-btn {
+    outline: none;
+    display: flex;
+    justify-content: right;
+    background-color: #24748f;
+    border: 3px solid #24748f;
+    padding: 0.5rem;
+    padding-right: 1rem;
+    color: #ebeced;
+    font-size: medium;
+    width: 12.5rem;
+    border-radius: 0.5rem;
+}
+
+.create-img {
+    position: absolute;
+    height: 1.5rem;
+    width: 1.5rem;
+    filter: invert(95%);
+    transform: translateX(100%);
+    top: 25%;
+}
+
+.text1{
+    text-decoration: none;
+    color: #ebeced;
+    font-weight: medium;
+}
+
+.brand {
+    display: flex;
+    justify-content: center;
+    font-weight: 600;
+    transform: translateY(-150%);
+    margin-right: 5rem;
+}
+
+.nav-img {
+    filter: invert(45%);
+    height: 2rem;
+    width: 2rem;
+    transform: translateY(-5%);
+}
+
+.nav-logo {
+    margin-left: 1rem;
+    filter: invert(100%);
+    height: 10rem;
+    width: 10rem;
+}
