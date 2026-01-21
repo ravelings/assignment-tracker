@@ -1,0 +1,17 @@
+:root{
+    --text: oklch(0.15 0.02 255);
+    --shadow: 2px 2px 2px hsla(0, 0%, 0%, 0.07), 2px 2.5px 2.5px hsla(0, 0%, 0%, 0.10);
+
+    --bg-dark: oklch(0.92 0.01 255);
+    --bg: oklch(0.96 0.01 255);
+    --bg-light: oklch(1 0.01 255);
+}
+
+.text1{
+    color: var(--text);
+}
+
+.custom-tooltip {
+  --bs-tooltip-bg: var(--bg-dark);
+  --bs-tooltip-color: var(--text);
+}

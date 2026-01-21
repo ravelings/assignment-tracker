@@ -19,7 +19,6 @@
 </head>
 
 <body>
-
     <div class="wrapper">
         <div class="sidebar-div">
             <ul class="sidebar">
@@ -33,7 +32,7 @@
                 </div>
                 <div class="item">
                     <li class="sidebar-item sidebar-brand">
-                        <a href="#" class="sidebar-link">
+                        <a class="sidebar-link">
                             <img class="nav-img" src="{{ url_for('static', filename='/images/navbar/dashboard1.svg') }}"> 
                             <span class="text1">Dashboard</span>
                         </a>
@@ -49,17 +48,11 @@
                     </li>
                 <div class="item">
                     <li class="sidebar-item">
-                        <a href="#" class="sidebar-link">
+                        <a href="{{ url_for('mainPage_bp.userInfo') }}" class="sidebar-link">
                             <img class="nav-img" src="{{ url_for('static', filename='/images/navbar/settings.svg') }}"> 
                             <span class="text1">Settings</span>
                         </a>
                     </li>
-                </div>
-                <div class="create-tab">
-                    <a >
-                        <img class="create-img" src="{{ url_for('static', filename='/images/navbar/add.svg') }}">
-                        <button class="create-btn">New Assignment</button>
-                    </a>
                 </div>
             </ul>
         </div>

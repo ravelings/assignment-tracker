@@ -1,14 +1,16 @@
 :root{
-    --shadow: 2px 2px 2px hsla(0, 0%, 0%, 0.07), 2px 2.5px 2.5px hsla(0, 0%, 0%, 0.10)
+    --shadow: 2px 2px 2px hsla(0, 0%, 0%, 0.07), 2px 2.5px 2.5px hsla(0, 0%, 0%, 0.10);
 
     --bg-dark: oklch(0.92 0.01 255);
     --bg: oklch(0.96 0.01 255);
     --bg-light: oklch(1 0.01 255);
-}
+}   
 
 .container, .assignment {
-    display: flex;
-    flex-direction: column;
+    width: 100%;
+    align-self: center;
+    margin: auto;
+    margin-top: 2.5rem;
 }
 
 .wrapper {
@@ -94,38 +96,6 @@ a {
   text-decoration: none;
 }
 
-.create-tab {
-    display: flex;
-    align-self: center;
-    margin-top: auto; 
-    margin-bottom: 10rem;
-    margin-right: 2.75rem;
-    position: relative;
-}
-
-.create-btn {
-    outline: none;
-    display: flex;
-    justify-content: right;
-    background-color: #24748f;
-    border: 3px solid #24748f;
-    padding: 0.5rem;
-    padding-right: 1rem;
-    color: #ebeced;
-    font-size: medium;
-    width: 12.5rem;
-    border-radius: 0.5rem;
-}
-
-.create-img {
-    position: absolute;
-    height: 1.5rem;
-    width: 1.5rem;
-    filter: invert(95%);
-    transform: translateX(100%);
-    top: 25%;
-}
-
 .text1{
     text-decoration: none;
     color: #ebeced;
@@ -152,4 +122,30 @@ a {
     filter: invert(100%);
     height: 10rem;
     width: 10rem;
+}
+
+.yes {
+    padding: 0.2rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+
+    background-color: #d1fae5;
+    border: 1px solid #b0f4d5;
+    border-radius: 1rem;
+
+    font-weight: 550;
+    color: #057958;
+}
+
+.no {
+    padding: 0.2rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+
+    background-color: #f1f5f9;
+    border: 1px solid #e5ebf2;
+    border-radius: 1rem;
+
+    font-weight: 550;
+    color: #64748b;
 }

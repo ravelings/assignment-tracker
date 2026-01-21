@@ -4,21 +4,23 @@ from forms.assignment import AssignmentCreateForm
 from forms.addTokenForm import AddTokenForm
 from repositories.assignmentRepo import AssignmentRepo
 from repositories.userRepo import UserRepo
+from repositories.courseRepo import CourseRepo
 
 assignments_bp = Blueprint("assignments", __name__, static_folder="static", template_folder="templates")
 
 repo = AssignmentRepo()
 
-@assignments_bp.route("/create/", methods=["POST", "GET"])
+@assignments_bp.route("/create/", methods=["POST"])
 @login_required
 def createAssignment():
-    form = AssignmentCreateForm()
+    courseRepo = CourseRepo()
+    form = AssignmentCreateForm().updateCourseSelect(courseRepo.getAllCoursesById(current_user.user_id))
 
     if form.validate_on_submit():
 
         user_id = current_user.user_id
 
-        course_name = form.course_name.data 
+        course_id = form.course_id.data 
         title = form.title.data 
         description = form.description.data 
         due = form.due.data 
@@ -28,7 +30,7 @@ def createAssignment():
 
         repo.createAssignment(
             user_id=user_id,
-            course_name=course_name,
+            course_id=course_id,
             title=title,
             desc=description,
             due=due,
@@ -37,9 +39,11 @@ def createAssignment():
             status=status
         )
         flash("Assignment created successfully!", "created")
-        return redirect(url_for("assignments.createAssignment"))
-
-    return render_template("addAssignment.html", form=form)
+        return redirect(url_for("mainPage.dashboard"))
+    
+    print("Form errors", form.errors)
+    print("Assignment create error")
+    return redirect(url_for("mainPage.dashboard"))
 
 @assignments_bp.route("/addCanvasToken/", methods=["POST", "GET"])
 @login_required

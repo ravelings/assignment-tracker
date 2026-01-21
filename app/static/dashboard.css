@@ -19,14 +19,6 @@
     --shadow: 0px 2px 2px hsla(0, 0%, 0%, 0.07), 0px 2.5px 2.5px hsla(0, 0%, 0%, 0.10)
 }
 
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: auto;
-    width: 100vw;
-}
-
 body{
     background-color: var(--bg-light);
 }
@@ -39,14 +31,6 @@ h1 {
     display: flex;
     justify-content: left;
     padding-bottom: 2.5rem;
-}
-
-.table-div {
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    margin: 1rem;
 }
 
 table, .assignment-table {
@@ -65,7 +49,6 @@ table, .assignment-table {
 th {
     text-transform: uppercase;
     font-size: 0.9rem;
-    color: var(--text);
     background-color: var(--bg-header);
     color: var(--text-muted);
     text-align: left;
@@ -157,4 +140,17 @@ th, td {
 
     border-color: var(--bg-light);
     border-radius: 0.5rem;
+}
+
+.assignment-table .delete{
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.assignment-table .table-row:hover .delete{
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
 }

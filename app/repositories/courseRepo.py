@@ -11,11 +11,15 @@ class CourseRepo:
 
     def getCourseByName(self, user_id, course_name):
         return Course.query.filter_by(user_id=user_id, course_name=course_name).first() 
+    
+    def getCourseById(self, user_id, course_id):
+        return Course.query.filter_by(user_id=user_id, course_id=course_id).first()
 
     def getAllCoursesById(self, user_id):
         return (Course.query
                 .filter_by(user_id = user_id)
                 .all())
+
     def get_SortedByName_Course(self, user_id):
         return (Course.query
                 .filter_by(user_id = user_id)
@@ -108,3 +112,4 @@ class CourseRepo:
                 db.session.add(old_course)
         else:
             self.commit()
+            return True

@@ -1,139 +1,371 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <head>
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dashboard.css') }}">
-        <title>Osmos Tracker</title>
-    </head>
-    
-    <h1>Active Assignments</h1>
+{% block head %}
+{{super()}}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dashboard.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='modal.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='button.css') }}">
+    <title>Osmos Tracker</title>
+{%  endblock %}
 
-    <div class="container">
-        
-        <div class="card-div">
-            <div class="card">
-                <p class="card-header1">Pending Tasks</p>
-                <p class="card-number">12</p>
-                <div class="tally">
-                    <p class="card-tally-pending">+2 this week</p>
-                </div>
-            </div>
+    <div class="container h-100 w-100">
 
-            <div class="card">
-                <p class="card-header1">Completed</p>
-                <p class="card-number">45</p>
-                <div class="tally">
-                    <p class="card-tally-completed">+1 today</p>
+        <div class="toast-container position-fixed top-0 end-30 p-3">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <img src="{{ url_for('static', filename='images/icons/sync1.svg') }}" 
+                    class="rounded me-2" 
+                    alt="...">
+                    <strong class="me-auto">Sync Status</strong>
+                    <small>Now</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-            </div>
-
-            <div class="card">
-                <p class="card-header1">Pending Tasks</p>
-                <p class="card-number">12</p>
-                <div class="tally">
-                    <p class="card-tally-due">+2 this week</p>
-                </div>
+                    <div class="toast-body">
+                        <p class="toast-text" id="toast-body"></p>
+                    </div>
             </div>
         </div>
-    
-        <div class="table-div">
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="?sort=due">Due</a>
-                    <a class="dropdown-item" href="?sort=course">Course</a>
-                    <a class="dropdown-item" href="?sort=points">Points</a>
-                    <a class="dropdown-item" href="?sort=priority">Priority</a>
+
+        <div id="alert-div">
+
+        </div>
+
+
+        <div class="col w-100">
+
+            <div class="row">
+                <h1>Active Assignments</h1>
+            </div>
+            <div class="row card-div">
+                <div class="card">
+                    <p class="card-header1">Pending Tasks</p>
+                    <p class="card-number">12</p>
+                    <div class="tally">
+                        <p class="card-tally-pending">+2 this week</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <p class="card-header1">Completed</p>
+                    <p class="card-number">45</p>
+                    <div class="tally">
+                        <p class="card-tally-completed">+1 today</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <p class="card-header1">Pending Tasks</p>
+                    <p class="card-number">12</p>
+                    <div class="tally">
+                        <p class="card-tally-due">+2 this week</p>
+                    </div>
                 </div>
             </div>
 
-            <table class="assignment-table">
-                <tr>
-                    <th>Assignment Name</th>
-                    <th>Course</th>
-                    <th>Due Date</th>
-                    <th>Priority</th>
-                    <th>Status</th>
-                </tr>
+            <div class="row button-div mt-3 mb-3 w-100">
+                <div class="w-auto p-0">
+                    <button type="button" class="btn btn-primary btn-create" onclick=showCreateModal()>
+                        <img class="create-img" src="{{ url_for('static', filename='/images/navbar/add.svg') }}">
+                        New Assignment
+                    </button>
+                </div>
 
-                {% for assignment in assignments %}
+                <div class="w-auto p-0 ms-auto">
+                    <button type="button" class="btn btn-primary" id="sync" onclick=sync()>
+                        <img class="btn-icon" src="{{ url_for('static', filename='images/icons/sync1.svg') }}">
+                        Sync with Canvas
+                    </button>
+                </div>
+
+                <div class="w-auto p-0 dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Sort by
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="?sort=due">Due</a></li>
+                        <li><a class="dropdown-item" href="?sort=course">Course</a></li>
+                        <li><a class="dropdown-item" href="?sort=points">Points</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+
+            <div class="row table-div w-100">
+
+                <table class="assignment-table">
                     <tr>
-                        <td class="title">{{assignment.title}}</td>
-                        <td><a class="course-name">{{assignment.course.course_name}}</a></td>
-                        <td>{{assignment.due}}</td>
-                        <td class="priority">{{"%.2f"|format(assignment.priority_score)}}</td>
-                        <td class="status">{{assignment.status}}</td>
+                        <th>Assignment Name</th>
+                        <th>Course</th>
+                        <th>Due Date</th>
+                        <th>Priority</th>
+                        <th>Status</th>
                     </tr>
-                {% endfor %}
-                <tr>
-                    <td>test1</td>
-                    <td><a class="course-name">Macroeconomics</a></td>
-                    <td>test3</td>
-                    <td>test4</td>
-                    <td>test5</td>
-                </tr>
-            </table>
-        </div>
 
+                    {% for assignment in assignments %}
+                        <tr class="table-row">
+                            <td class="title">
+                                <button 
+                                    class="btn-name" 
+                                    onclick=showEditModal(this)
+                                    data-assignment-id="{{assignment.assignment_id}}"
+                                    data-canvas-id="{{assignment.canvas_assignment_id}}"
+                                    data-assignment-name="{{assignment.title}}"
+                                    data-assignment-desc="{{assignment.description}}"
+                                    data-effort="{{assignment.effort}}">
+
+                                    {{assignment.title}}
+                                </button>
+                            </td>
+                            <td><a class="course-name">{{assignment.course.course_name}}</a></td>
+                            <td>{{assignment.due}}</td>
+                            <td class="priority">{{"%.2f"|format(assignment.priority_score)}}</td>
+                            <td class="status d-flex align-items-center">
+                                {{assignment.status}}
+                                <button
+                                    class="btn delete w-auto ms-auto" 
+                                    onclick=showDeleteModal(this)
+                                    data-assignment-id="{{ assignment.assignment_id }}">
+                                    <img src="{{ url_for('static', filename='images/icons/delete_red.svg') }}">
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td>test1</td>
+                        <td><a class="course-name">Macroeconomics</a></td>
+                        <td>test3</td>
+                        <td>test4</td>
+                        <td>test5</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
     </div>
-        
-        <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="false">
-                Sort by
-            </button>
+
+    <!-- Modal - CREATE -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+
         </div>
-
-        <div>
-            <button type="button" class="btn btn-primary" id="sync" onclick=sync()>
-                Sync Now
-            </button>
-        </div>
-
-        <p id="alert"></p>
-
-        <dialog id="confirmDeleteDialog">
-            <p>Are you sure you want to delete the assignment?</p>
-            <div>
-                <form id="deleteForm" method="POST">
-                    {{ deleteForm.submit }}
-                </form>
-            </div>
-            <div>
-                <button id="closeDialog" onclick=closeDialog(this)>Cancel</button>
-            </div>
-        </dialog>
-
-        <dialog id="deleteDialog">
-            <p id="deleteMessage"></p>
-            <div>
-                <button id="closeDialog" onclick=closeDialog(this)>Confirm</button>
-            </div>
-        </dialog>
     </div>
-{% endblock %}
+    </div>
+
+    <template id="tmpl-create">
+        <div class="modal-content container-fluid">
+        <form method="POST" action="{{ url_for('assignments.createAssignment') }}">
+            {{assignmentForm.hidden_tag()}}
+            <div class="modal-header d-flex">
+                <img clas="icon-add align-self-center" src="{{ url_for('static', filename='images/icons/add1.svg') }}">
+                <h1 class="modal-title heading0 pb-1" id="exampleModalLabel">New Assignment</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="col">
+                <div class="row">
+                    <div class="title">
+                        <p class="heading1 align-self-end mb-1 mt-1">Title</p>
+                        {{assignmentForm.title(class_="input w-100 p-1")}}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="title">
+                        <p class="heading1 align-self-end mb-1 mt-3">Description</p>
+                        {{assignmentForm.description(class_="input w-100 p-1")}}
+                    </div>
+                </div> 
+            </div>
+
+            <div class="modal-selectors">
+                <div class="row">
+                    <div class="col">
+                        <div class="row mb-1">
+                            <div class="modal-field d-flex flex-column">
+                                <p class="heading1 mb-1 mt-3">Course Name</p>
+                                {{assignmentForm.course_id(class_="input dropdown align-self-center w-100")}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="modal-field d-flex flex-column">
+                                <p class="heading1 mb-1 mt-3">Effort Level</p>
+                                <div class="btn-group" role="group" aria-label="Effort Level">
+                                    {% for subfield in assignmentForm.effort %}
+                                        {{subfield(class_="btn-check", autocomplete="off")}}
+                                        <label class="btn btn-radio" for="{{subfield.id}}">{{subfield.label.text}}</label>
+                                    {% endfor %}
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="col">
+                        <div class="row flex-row mb-1">
+                            <div class="modal-field d-flex flex-column">
+                                <p class="heading1 mb-1 mt-3">Due Date</p>
+                                {{assignmentForm.due(class_="input align-self-center w-100")}}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="modal-field d-flex flex-column mb-3">
+                                <p class="heading1 mb-1 mt-3">Status</p>
+                                {{assignmentForm.status(class_="input dropdown align-self-center w-100")}}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                {{assignmentForm.submit(class_="btn btn-primary btn-create")}}
+            </div>
+        </form>
+        </div>
+    </template>
+
+    <template id="tmpl-delete">
+        <div class="modal-content container-fluid">
+                <div class="col w-auto p-auto">
+                    <div class="header1 modal-header w-auto">
+                        <h1 class="modal-title fs-5 pb-1 w-auto" id="exampleModalLabel">Delete Course?</h1>
+                        <button type="button" class="btn-close w-auto mr-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="row modal-body">
+                        Are you sure you want to delete this assignment?
+                    </div>
+                    <div class="row modal-footer">
+                        <button type="button" class="btn btn-secondary w-auto" data-bs-dismiss="modal">Close</button>
+                        <form class="w-auto p-0" id="deleteForm" method="POST">
+                            {{ deleteForm.hidden_tag() }}
+                            {{ deleteForm.submit(class_="btn btn-delete p-2 w-auto") }}
+                        </form>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="tmpl-edit">
+        <div class="modal-content container-fluid">
+                <div class="col w-auto p-auto">
+                    <div class="header1 modal-header w-auto">
+                        <h1 class="modal-title fs-5 pb-1 w-auto" id="modalTitle"> </h1>
+                        <div class="ms-auto" id="canvasStatus"> </div>
+                        <button type="button" class="btn-close w-auto mr-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="editForm" method="POST">
+                        {{editForm.hidden_tag()}}
+                        <div class="modal-body">
+                            <div class="row" id="desc">
+
+                            </div>
+                            <div class="row modal-field d-flex flex-column">
+                                <p class="heading1 mb-1 mt-3">Effort Level</p>
+                                <div class="btn-group" role="group" aria-label="Effort Level">
+                                    {% for subfield in editForm.effort %}
+                                        {{subfield(class_="btn-check", autocomplete="off")}}
+                                        <label class="btn btn-radio" for="{{subfield.id}}">{{subfield.label.text}}</label>
+                                    {% endfor %}
+                                    
+                                </div>
+                            
+                        </div>
+                        <div class="row modal-footer">
+                            <button type="button" class="btn btn-secondary w-auto" data-bs-dismiss="modal">Close</button>
+                                {{ editForm.submit(class_="btn btn-primary p-2 w-auto") }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </template>
 
 {% block scripts %}
 <script>
+    const modal = document.getElementById("exampleModal");
+    const body = modal.querySelector(".modal-body");
 
-    function confirmDeleteDialog() {
-        const confirmDialog = document.getElementById("confirmDeleteDialog");
+    modal.addEventListener("hidden.bs.modal", () => {
+    body.replaceChildren();
+    });
 
-        const button = document.getElementById("deleteButton");
+    const alertTrigger = document.getElementById('liveAlertBtn')
+if (alertTrigger) {
+  alertTrigger.addEventListener('click', () => {
+    appendAlert('Nice, you triggered this alert message!', 'success')
+  })
+}
+
+    function showCreateModal() {
+        body.replaceChildren(
+            document.getElementById("tmpl-create").content.cloneNode(true)
+        );
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
+
+    function showDeleteModal(button) {
+        body.replaceChildren(
+            document.getElementById("tmpl-delete").content.cloneNode(true)
+        );
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+
         const assignment_id = button.dataset.assignmentId;
-
         const form = document.getElementById("deleteForm");
         form.action = `/dashboard/assignments/delete/${assignment_id}`;
+        console.log("Course ID: ", course_id)
+        console.log("Showing modal...")
 
-        confirmDialog.showModal();
     }
-    function closeDialog() {
-        const cloesDialog = document.getElementById(this.closest("dialog"));
-        closeDialog.close();
-    }
-    function deleteDialog(message) {
-        const deleteDialog = document.getElementById("deleteDialog");
-        const text = document.getElementById("deleteMessage");
-        text.textContent = message;
-        deleteDialog.showModal();
+
+    function showEditModal(button) {
+        const assignment_id = button.dataset.assignmentId;
+        const assignment_name = button.dataset.assignmentName;
+        const canvas_id = button.dataset.canvasId;
+        const desc = button.dataset.assignmentDesc;
+        const effort = button.dataset.effort;
+        
+        body.replaceChildren(
+            document.getElementById("tmpl-edit").content.cloneNode(true)
+        );
+        const title = body.querySelector("#modalTitle")
+        const descBody = body.querySelector('#desc')
+        const isCanvas = body.querySelector("#canvasStatus")
+        title.innerHTML = [`${assignment_name}`]
+        descBody.innerHTML = [`<strong class="heading1 mb-1 mt-3">Description:</strong> ${desc}`]
+
+        if (canvas_id == null) {
+            isCanvas.innerHTML = ['<span class="no">Local Assignment</span>']
+        }
+        else {
+            isCanvas.innerHTML = [`<span class="yes fs-6">Canvas Assignment</span>`]
+        }
+
+        const radioForm = body.querySelector(`input[name="effort"][value="${effort}"]`);
+        if (radioForm) radioForm.checked=true;
+
+        console.log("Showing modal...")
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+
+        const form = document.getElementById("editForm");
+        form.action = `/dashboard/assignments/${assignment_id}/edit`
+        }
+
+    function createAlert(message, type) {
+        const alert_div = document.getElementById("alert-div");
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = [
+            `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+            `   <div>${message}</div>`,
+            '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+            '</div>'
+        ].join('')
+
+        alert_div.append(wrapper);
     }
 
     function syncFail() {
@@ -154,9 +386,20 @@
         `;
     }
 
+    function showToast(message) {
+        const toastLiveExample = document.getElementById('liveToast');
+
+        const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
+        const text_body = document.getElementById("toast-body");
+
+        text_body.innerHTML = message;
+        toastBootstrap.show();
+    }
+
     async function sync() {
         console.log("Sync starts")
         const button = document.getElementById("sync");
+        button.classList.add("is-spinning");
         button.disabled = true;
         try {
             const result = await fetch("/dashboard/assignments/sync", {
@@ -173,35 +416,40 @@
             const data = await result.json();
 
             if (!result.ok || data.status !== "success") {
-                syncFail()
+                showToast("Sync failed!")
                 return;
             }
 
-            syncSuccess();
+            showToast("Sync Success! Refreshing...")
 
-            setTimeout(() => location.reload(), 2000);
+            setTimeout(() => location.reload(), 3000);
         }
         finally {
-            button.disabled = false;
         }
     }
 </script>
 
 {%with messages = get_flashed_messages(with_categories=true)%}
-{%if messages%}
-{% for category, msg in messages %}
-{% if category == "deleteTrue" %}
-<script>
-    deleteDialog({{ msg| tojson }});
-</script>
-{%endif%}
-{% if category == "token" %}
-<script>
-    deleteDialog({{ msg| tojson }});
-</script>
-{%endif%}
-{%endfor%}
-{%endif%}
-{%endwith%}
+    {%if messages%}
+        {% for category, msg in messages %}
+            {% if category == "deleteTrue" %}
+                <script>
+                    createAlert({{ msg| tojson }}, "success");
+                </script>
+            {%endif%}
+            {% if category == "deleteFalse" %}
+                <script>
+                    createAlert({{ msg| tojson }}, "danger");
+                </script>
+            {%endif%}
+            {% if category == "token" %}
+                <script>
+                    createAlert({{ msg| tojson }}, "warning");
+                </script>
+            {%endif%}
+        {%endfor%}
+    {%endif%}
+    {%endwith%}
+{% endblock %}
 {% endblock %}
 

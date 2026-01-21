@@ -1,45 +1,75 @@
-<html>
-
+{% extends "base.html" %}
+{% block head %}
+    {{super()}}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='settings.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='button.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='modal.css') }}">
+{%  endblock %}
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-6 text-gray-800">Settings</h1>
+<div class="container">
 
-    <div class="bg-white shadow-md rounded-lg p-6">
-        <h2 class="text-xl font-semibold mb-4 text-gray-700">Prioritization Strategy</h2>
-        <form method="POST">
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">
-                    Scoring Function
-                </label>
-                <div class="space-y-2">
-                    <div class="flex items-center">
-                        <input type="radio" id="logistic" name="scoring_strategy" value="logistic" {% if
-                            settings.scoring_strategy=='logistic' %}checked{% endif %} class="mr-2">
-                        <label for="logistic" class="text-gray-700">
-                            <strong>Logistic Function (3-Day Spike):</strong> Priority increases exponentially as the
-                            deadline approaches (T=72h). Best for "crisis mode" last-minute work.
-                        </label>
-                    </div>
-                    <div class="flex items-center">
-                        <input type="radio" id="exponential" name="scoring_strategy" value="exponential" {% if
-                            settings.scoring_strategy=='exponential' %}checked{% endif %} class="mr-2">
-                        <label for="exponential" class="text-gray-700">
-                            <strong>Exponential Decay (Continuous Pressure):</strong> Priority increases smoothly and
-                            continuously over time (T=168h). Best for steady, consistent work.
-                        </label>
-                    </div>
-                </div>
+    <div class="col">
+        <div class="row" id="accountInfo">
+            <h1 class="heading1">Account</h1>
+            <div class="col" id="username">
+                <p class="heading2">Username</p>
+                <p class="text1">John Doe</p>
             </div>
-
-            <div class="flex items-center justify-end mt-6">
-                <button type="submit"
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Save Settings
-                </button>
+            <div class="col" id="userId">
+                <p class="heading2">User ID</p>
+                <p class="text1">12345</p>
             </div>
-        </form>
+        </div>
+        <div class="row" id="settings">
+            <h1 class="heading1">Settings</h1>
+            {% for subfield in scoreForm.function %}
+                {% if loop.index0 == 0 %}
+                    <div class="w-auto d-flex align-items-center">
+                        {{subfield(class_="form-check-input ms-auto", type="radio")}}
+                        <label class="btn btn-radio mb-0" for="{{subfield.id}}">{{subfield.label.text}}</label>
+                        <button type="button" class="btn w-auto"
+                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                data-bs-custom-class="custom-tooltip"
+                                data-bs-title="
+                                Priority increases exponentially as the
+                                deadline approaches 72 hours. Best for last minute work.">
+                            <img src="{{ url_for('static', filename='images/icons/info.svg') }}">
+                        </button>
+                    </div>
+                {% else %}
+                    <div class="w-auto d-flex align-items-center">
+                        {{subfield(class_="form-check-input ms-auto", type="radio")}}
+                        <label class="btn btn-radio mb-0 " for="{{subfield.id}}">{{subfield.label.text}}</label>
+                        <button type="button" class="btn w-auto"
+                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                data-bs-custom-class="custom-tooltip"
+                                data-bs-title="
+                                Priority increases smoothly and continuously over 
+                                1 week (168 hours). Best for steady, consistent work.">
+                                <img src="{{ url_for('static', filename='images/icons/info.svg') }}">
+                        </button>
+                    </div>
+                {%endif%}
+            {%endfor%}
+        </div>
+        <div class="row" id="integrations">
+            <h1 class="heading1">Integrations</h1>
+            <p>...</p>
+        </div>
+        <div class="row" id="logout">
+            <button class="btn btn-primary w-auto">
+                <img src="{{ url_for('static', filename='images/icons/logout.svg') }}">
+                Logout from Account
+            </button>
+        </div>
     </div>
+
 </div>
 {% endblock %}
 
-</html>
+{% block scripts %}
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
+{% endblock %}

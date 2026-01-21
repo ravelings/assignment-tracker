@@ -1,160 +1,358 @@
-<!doctype html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content="" />
-    <title>Browse Courses</title>
+{% block content %}
 
-    <!-- Bootstrap CSS (v4.3.1) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
-        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
-</head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='course.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='button.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='modal.css') }}">
+
 <title>Browse Courses</title>
 
-<body>
+<p id="alert"></p>
+<div class="toast-container position-fixed top-0 end-0 p-3">
+            <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast-header">
+                    <img src="{{ url_for('static', filename='images/icons/sync1.svg') }}" 
+                    class="rounded me-2" 
+                    alt="...">
+                    <strong class="me-auto">Sync Status</strong>
+                    <small>Now</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                    <div class="toast-body">
+                        <p class="toast-text" id="toast-body"></p>
+                    </div>
+            </div>
+</div>
+    <div class="container h-100 w-100">
+        
+        
+        <div class="col w-100">
+            <div class="row">
+                <h1 class="p-0">Browse Courses</h1>
+            </div>
 
-    <div class="container">
-        <h1>Browse Courses</h1>
+            <div class="row mt-3 mb-3">
+
+                <div class="w-auto p-0">
+                    <button type="button" onclick=showCreateModal() class="btn btn-primary">
+                        <img class="create-img" src="{{ url_for('static', filename='/images/navbar/add.svg') }}">
+                        New Course
+                    </button>
+                </div>
+
+                <div class="w-auto ms-auto pr-0">
+                    <button type="button" class="btn btn-primary" id="sync" onclick=sync()>
+                        <img class="btn-icon" src="{{ url_for('static', filename='images/icons/sync1.svg') }}">
+                        Sync with Canvas
+                    </button>
+                </div>
+
+                <div class="w-auto p-0 dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Sort by
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="?sort=name">Name</a></li>
+                        <li><a class="dropdown-item" href="?sort=weight">Weight</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="row">
+                <table class="course-table">
+                    <tr>
+                        <th>Course</th>
+                        <th>Canvas Course</th>
+                        <th>Weight</th>
+                    </tr>
+                    {% for course in courses %}
+                        <tr class="table-row">
+                            <td>
+                                <button 
+                                class="btn-name" 
+                                onclick=showEditModal(this)
+                                data-course-id="{{course.course_id}}"
+                                data-course-name="{{course.course_name}}"
+                                data-canvas-id="{{course.canvas_course_id}}"
+                                data-weight="{{course.weight}}">
+                                {{course.course_name}}
+                                </button>
+                            </td>
+                            {% if course.canvas_course_id is not none: %}
+                                <td><span class="yes">Yes</span></td>
+                            {% else: %}
+                                <td><span class="no">No</span></td>
+                            {%endif%}
+                            <td class="d-flex">
+                                <span class="weight">{{course.weight}}</span>
+                                <button
+                                    class="btn delete w-auto ms-auto" 
+                                    onclick=showDeleteModal(this)
+                                    data-course-id="{{ course.course_id }}">
+                                    <img src="{{ url_for('static', filename='images/icons/delete_red.svg') }}">
+                                </button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+        
+        <!-- Modal - CREATE -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-body">
+
+        </div>
+    </div>
     </div>
 
-    <p id="alert"></p>
-
-    {% for course in courses %}
-    <div>
-        <h1>Coures Name: {{course.course_name}}</h1>
-        <p>Canvas ID: {{course.canvas_course_id}} </p>
-        <p>Weight: {{course.weight}}</p>
-        <div>
+        <dialog id="mainDialog">
+            <p id="message"></p>
             <div>
-                <button id="deleteButton" onclick=confirmDeleteDialog(this) type="button" class="btn btn-danger"
-                    data-course-id="{{ course.course_id }}">
-                    Delete
-                </button>
-
-                <button id="setWeightButton" onclick=confirmSetWeightDialog(this) type="button" class="btn btn-primary"
-                    data-course-id="{{ course.course_id }}">
-                    {{weightForm.course_id(value=course.course_id)}}
-                    Set Weight
-                </button>
+                <button id="closeDialog" onclick=closeDialog()>Confirm</button>
             </div>
-            {% endfor %}
+        </dialog>
 
-            <dialog id="mainDialog">
-                <p id="message"></p>
-                <div>
-                    <button id="closeDialog" onclick=closeDialog()>Confirm</button>
+        <dialog class="dialog" id="deleteDialog">
+            <p class="heading1">WARNING!</p>
+            <p class="text1">This will delete all assignments associated with this course.</p>
+            <div>
+                <form id="deleteForm" method="POST">
+                    {{ deleteForm.submit(class_="btn btn-primary") }}
+                </form>
+            </div>
+            <div>
+                <button class="btn btn-primary" id="closeDialog" onclick=closeDialog(this)>Cancel</button>
+            </div>
+        </dialog>
+
+
+    <template id="tmpl-create">
+            <form class="create" method="POST" action="{{url_for('courses.createCourse')}}">
+                {{ form.hidden_tag() }}
+                <div class="modal-content container-fluid">
+                        <div class="modal-header d-flex">
+                            <img clas="icon-add" src="{{ url_for('static', filename='images/icons/add1.svg') }}">
+                            <h1 class="modal-title heading0 pb-1" id="exampleModalLabel">New Course</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <div class="col">
+                            <div class="row">
+                                <div class="title">
+                                    <p class="heading1 align-self-end mb-1.5 mt-1">Course Name</p>
+                                    {{form.course_name(class_="input w-100 p-1")}}
+                                </div>
+                            </div>
+
+                        <div class="modal-selectors">
+                            <div class="row">
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="modal-field d-flex flex-column">
+                                            <p class="heading1 mb-1 mt-3">Course Weight</p>
+                                            <div class="btn-group" role="group" aria-label="Effort Level">
+                                                {% for subfield in form.weight %}
+                                                    {{subfield(class_="btn-check", autocomplete="off")}}
+                                                    <label class="btn btn-radio" for="{{subfield.id}}">{{subfield.label.text}}</label>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    
                 </div>
-            </dialog>
 
-            <dialog id="confirmDeleteDialog">
-                <p>WARNING!</p>
-                <p>This will delete all assignments associated with this course.</p>
-                <div>
-                    <form id="deleteForm" method="POST">
-                        {{ deleteForm.submit }}
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    {{form.submit(class_="btn btn-primary")}}
+                </div>
+            </form>
+    </template>
+
+    <template id="tmpl-delete">
+        <div class="modal-content container-fluid">
+                <div class="col w-auto p-auto">
+                    <div class="header1 modal-header w-auto">
+                        <h1 class="modal-title fs-5 pb-1 w-auto" id="exampleModalLabel">Delete Course?</h1>
+                        <button type="button" class="btn-close w-auto mr-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="row modal-body">
+                        Deleting the course will also delete its associated assignments.
+                    </div>
+                    <div class="row modal-footer">
+                        <button type="button" class="btn btn-secondary w-auto" data-bs-dismiss="modal">Close</button>
+                        <form class="w-auto p-0" id="deleteForm" method="POST">
+                            {{ deleteForm.hidden_tag() }}
+                            {{ deleteForm.submit(class_="btn btn-delete p-2 w-auto") }}
+                        </form>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="tmpl-edit">
+        <div class="modal-content container-fluid">
+                <div class="col w-auto p-auto">
+                    <div class="header1 modal-header w-auto">
+                        <h1 class="modal-title fs-5 pb-1 w-auto" id="modalTitle"></h1>
+                        <div class="ms-auto" id="canvasStatus"> </div>
+                        <button type="button" class="btn-close w-auto mr-1" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="editForm" method="POST">
+                        {{weightForm.hidden_tag()}}
+                        <div class="row modal-body">
+                            <p class="heading1 mb-1 mt-3">Course Weight</p>
+                            <div class="btn-group" role="group" aria-label="Course Weight">
+                                {% for subfield in weightForm.weight %}
+                                    {{subfield(class_="btn-check", autocomplete="off")}}
+                                    <label class="btn btn-radio" for="{{subfield.id}}">{{subfield.label.text}}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="row modal-footer">
+                            <button type="button" class="btn btn-secondary w-auto" data-bs-dismiss="modal">Close</button>
+                                {{ weightForm.submit(class_="btn btn-primary p-2 w-auto") }}
+                            </button>
+                        </div>
                     </form>
                 </div>
-                <div>
-                    <button id="closeDialog" onclick=closeDialog(this)>Cancel</button>
-                </div>
-            </dialog>
-
-            <dialog id="setWeightDialog">
-                <p>Choose a weight for this course:</p>
-                <div>
-                    <form id="WeightForm" method="POST" action="{{ url_for('courses.updateCourseWeight') }}">
-                        {{ weightForm.hidden_tag() }}
-                        <p>{{ weightForm.weight }}</p>
-                        <p>{{ weightForm.submit }}</p>
-                    </form>
-                </div>
-                <div>
-                    <button id="closeDialog" onclick=closeDialog(this)>Cancel</button>
-                </div>
-            </dialog>
-
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Sort by
-                </button>
-
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="?sort=name">Name</a>
-                    <a class="dropdown-item" href="?sort=weight">Weight</a>
-                </div>
             </div>
+        </div>
+    </template>
 
-            <!-- Bootstrap JS dependencies -->
-            <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-                integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-                crossorigin="anonymous"></script>
-            <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
-                integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-                crossorigin="anonymous"></script>
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
-                integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-                crossorigin="anonymous"></script>
-            <script>
-                function showDialog(message) {
-                    document.getElementById("mainDialog").showModal();
-                    document.getElementById("message").innerHTML = message;
+    <script>
+        const modal = document.getElementById("exampleModal");
+        const body = modal.querySelector(".modal-body");
+
+        modal.addEventListener("hidden.bs.modal", () => {
+        body.replaceChildren();
+        });
+
+        function showDialog(message) {
+            document.getElementById("mainDialog").showModal();
+            document.getElementById("message").innerHTML = message;
+        }
+        function closeDialog() {
+            const dialog = document.getElementById("mainDialog");
+            dialog.close();
+        }
+
+        function showCreateModal() {
+            body.replaceChildren(
+                document.getElementById("tmpl-create").content.cloneNode(true)
+            );
+            bootstrap.Modal.getOrCreateInstance(modal).show();
+        }
+
+        function showDeleteModal(button) {
+            const course_id = button.dataset.courseId;
+            body.replaceChildren(
+                document.getElementById("tmpl-delete").content.cloneNode(true)
+            );
+            bootstrap.Modal.getOrCreateInstance(modal).show();
+
+            const form = document.getElementById("deleteForm");
+            form.action = `/dashboard/course/delete/${course_id}`;
+            console.log("Course ID: ", course_id)
+            console.log("Showing modal...")
+
+        }
+        
+        function showEditModal(button) {
+            const course_id = button.dataset.courseId;
+            const course_name = button.dataset.courseName;
+            const canvas_id = button.dataset.canvasId;
+            const weight = parseInt(button.dataset.weight);
+            console.log("Weight: ", weight);
+
+            body.replaceChildren(
+                document.getElementById("tmpl-edit").content.cloneNode(true)
+            );
+            const title = body.querySelector("#modalTitle")
+            const isCanvas = body.querySelector("#canvasStatus")
+
+            title.innerHTML = [`${course_name}`]
+
+            if (canvas_id == null) {
+            isCanvas.innerHTML = ['<span class="no">Local Course</span>']
+            }
+            else {
+                isCanvas.innerHTML = [`<span class="yes fs-6">Canvas Course</span>`]
+            }
+
+            const radioForm = body.querySelector(`input[name="weight"][value="${weight}"]`);
+            if (radioForm) radioForm.checked=true;
+
+            console.log("Showing modal...")
+            bootstrap.Modal.getOrCreateInstance(modal).show();
+
+            const form = document.getElementById("editForm");
+            form.action = `/dashboard/course/${course_id}/setweight/`;
+            console.log("Course ID: ", course_id)
+
+        }
+        
+        function confirmSetWeightDialog(button) {
+            const course_id = button.dataset.courseId;
+            console.log("CourseID:" + course_id);
+            hidden = document.getElementById("WeightForm").elements["course_id"];
+            hidden.value = course_id;
+            console.log("Hidden:" + hidden.value);
+            const setWeightDialog = document.getElementById("setWeightDialog");
+            setWeightDialog.showModal();
+
+        }
+
+        function showToast(message) {
+            const toastLiveExample = document.getElementById('liveToast');
+
+            const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
+            const text_body = document.getElementById("toast-body");
+
+            text_body.innerHTML = message;
+            toastBootstrap.show();
+        }
+
+        async function sync() {
+            console.log("Sync starts")
+            const button = document.getElementById("sync");
+            button.classList.add("is-spinning");
+            button.disabled = true;
+            try {
+                const result = await fetch("/dashboard/course/sync", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                const contentType = result.headers.get("Content-Type") || "";
+                if (!contentType.includes("application/json")) {
+                    alert("Login session invalid, please login again");
+                    return;
                 }
-                function closeDialog() {
-                    const dialog = document.getElementById("mainDialog");
-                    dialog.close();
-                }
-                function confirmDeleteDialog(button) {
-                    const confirmDialog = document.getElementById("confirmDeleteDialog");
 
-                    const course_id = button.dataset.courseId;
+                const data = await result.json();
 
-                    const form = document.getElementById("deleteForm");
-                    form.action = `/dashboard/course/delete/${course_id}`;
-
-                    confirmDialog.showModal();
-                }
-                function confirmSetWeightDialog(button) {
-                    const course_id = button.dataset.courseId;
-                    console.log("CourseID:" + course_id);
-                    hidden = document.getElementById("WeightForm").elements["course_id"];
-                    hidden.value = course_id;
-                    console.log("Hidden:" + hidden.value);
-                    const setWeightDialog = document.getElementById("setWeightDialog");
-                    setWeightDialog.showModal();
-
+                if (!result.ok || data.status !== "success") {
+                    showToast("Sync failed!")
+                    return;
                 }
 
-                function weightAlert() {
-                    const host = document.getElementById("alert")
-                    host.innerHTML = `
-            <div class="alert alert-success" role="alert">
-                Weight updated successfully!
-            </div>
-            `;
-                    setTimeout(() => {
-                        host.innerHTML = "";
-                    }, 5000);
+                showToast("Sync Success! Refreshing...")
 
-                }
-                function redAlert(message) {
-                    const host = document.getElementById("alert")
-                    host.innerHTML = `
-            <div class="alert alert-danger" role="alert">
-                ${message}
-            </div>
-            `;
-                    setTimeout(() => {
-                        host.innerHTML = "";
-                    }, 5000);
-
-                }
-            </script>
-
-
-</body>
+                setTimeout(() => location.reload(), 3000);
+            }
+            finally {
+            }
+        }
+    </script>
 
 {%with messages = get_flashed_messages(with_categories=true)%}
 {%if messages%}
@@ -177,5 +375,7 @@
 {%endfor%}
 {%endif%}
 {%endwith%}
+
+{% endblock %}
 
 </html>

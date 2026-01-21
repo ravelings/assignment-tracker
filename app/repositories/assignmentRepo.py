@@ -11,15 +11,8 @@ class AssignmentRepo:
     def commit(self):
         db.session.commit()
 
-    def createAssignment(self, user_id, course_name, title, desc=None, due=None, points=None, effort=1, status=0):
+    def createAssignment(self, user_id, course_id, title, desc=None, due=None, points=None, effort=1, status=0):
         created = date.today().isoformat()
-
-        course = self.courseRepo.getCourseByName(user_id, course_name)
-
-        if course is None:
-            course = self.courseRepo.createCourse(user_id, course_name)
-
-        course_id = course.course_id
 
         assignment = Assignment(
             user_id=user_id,
@@ -42,13 +35,16 @@ class AssignmentRepo:
         filtered = []
         for assignment in assignments:
                 already_exist = Assignment.query.filter_by(canvas_assignment_id=assignment.canvas_assignment_id).all()
-                if already_exist is None:
+                if len(already_exist) == 0:
+                    print("Filtered.")
                     filtered.append(assignment)
+                else: 
+                    print("Assigment exists already")
         
         return filtered
 
     def createCanvasAssignment(self, canvasAssignment):
-
+        print("Creating canvas assignment...")
         if isinstance(canvasAssignment, (list, tuple)):
             filtered = self.filterAssignmentByCanvasId(assignments=canvasAssignment)
             if filtered:
@@ -56,8 +52,10 @@ class AssignmentRepo:
         else:
             already_exist = Assignment.query.filter_by(canvas_assignment_id=canvasAssignment.canvas_assignment_id).all()
             if already_exist is not None:
+                print("Assignment already exists")
                 return 
             
+            print("Adding assignment...")
             db.session.add(canvasAssignment)
 
         self.commit()
@@ -89,7 +87,7 @@ class AssignmentRepo:
         return (
             Assignment.query
             .filter_by(user_id=user_id)
-            .order_by(Assignment.points.desc())
+            .order_by(Assignment.points_possible.desc())
             .all()
         )
     def get_SortedByDue_Assignment(self, user_id):
@@ -116,7 +114,7 @@ class AssignmentRepo:
             .filter_by(user_id=user_id, assignment_id=assignment_id) 
             .first()
         )
-    
+
     def deleteAssignmentById(self, user_id, assignment_id):
         assignment = self.getAssignmentById(user_id, assignment_id)
 
@@ -165,3 +163,12 @@ class AssignmentRepo:
         
         return scores_data
 
+    def setEffort(self, assignment_id, effort):
+        assignment = Assignment.query.filter_by(assignment_id=assignment_id).first()
+        if assignment is None:
+            return False
+        
+        assignment.effort = effort 
+        assignment.updated = date.today().isoformat()
+        self.commit()
+        return True

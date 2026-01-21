@@ -42,7 +42,11 @@ class CanvasClient:
             
 
     def getAssignmentsByCourse(self, user_id: int, course: Course):
-        if course.workflow_state != "available":
+        state = course.workflow_state
+        print(f"Course Object: {course}")
+        print(f"State: {state}")
+        if state not in ("available", "active", "published"):
+            print("Course unavailable")
             return None
         
         canvas_course_id = str(course.canvas_course_id)
@@ -53,8 +57,14 @@ class CanvasClient:
         assignments = requests.get(request).json()
 
         assignment_list = []
+        print(f"Assignments: {assignments}")
 
         for assignment in assignments:
+            state = assignment["workflow_state"]
+            if state not in ("published"):
+                print("Assignment unavailable")
+                continue
+
             print(f"Course ID: {course_id}" )
             to_append = Assignment(
                 user_id=user_id,

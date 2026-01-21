@@ -13,13 +13,14 @@ from exceptions.CourseEmptyError import CourseEmptyError
 
 courses_bp = Blueprint("courses", __name__, static_folder="static", template_folder="templates")
 
-@courses_bp.route("/course/", methods=["POST", "GET"])
+@courses_bp.route("/", methods=["POST", "GET"])
 @login_required
 def course():
     user_id = current_user.user_id
     repo = CourseRepo()
     deleteForm = DeleteCourseForm()
     weightForm = CourseWeightForm()
+    courseForm = CourseCreateForm()
     sort_key = (request.args.get("sort") or "default").strip().lower()
     if sort_key is None:
         sort_key = "default"
@@ -32,9 +33,9 @@ def course():
 
     courses = SORT_MAP.get(sort_key, repo.getAllCoursesById)(user_id)
 
-    return render_template("course.jinja2", courses=courses, deleteForm=deleteForm, weightForm=weightForm)
+    return render_template("course.jinja2", courses=courses, form=courseForm, deleteForm=deleteForm, weightForm=weightForm)
 
-@courses_bp.route("/create/course/", methods=["POST", "GET"])
+@courses_bp.route("/create/", methods=["POST"])
 @login_required
 def createCourse():
     form = CourseCreateForm()
@@ -53,11 +54,10 @@ def createCourse():
             weight=weight
         )
         flash("Course created successfully!", "created")
-        return redirect(url_for("courses.createCourse"))
+        return redirect(url_for("courses.course"))
+    return redirect(url_for("courses.course"))
 
-    return render_template("createCourse.jinja2", form=form)
-
-@courses_bp.route("/create/course/sync", methods=["POST"])
+@courses_bp.route("/sync/", methods=["POST"])
 @login_required
 def syncCourse():
     userRepo = UserRepo()
@@ -65,26 +65,30 @@ def syncCourse():
     user_id = current_user.user_id
     token = userRepo.getCanvasToken(user_id)
     if token is None:
+        print("Token not set up")
         flash("Error: Token not set, please set up token before syncing.", category="fail")
         return jsonify({"status": "failed"})
     
     client = CanvasClient(user_id=user_id, token=token, instance="canvas")
     canvasCourses =  client.getCourses()
     if canvasCourses is None:
+        print("Canvas course is none")
         flash("Error: Token invalid.", category="fail")
         return jsonify({"status": "failed"})
         
-    add_course = courseRepo.addCanvasCourse(canvasCourses)
+    add_course = courseRepo.upsertCanvasCourse(canvasCourses)
 
     if add_course is True:
         return jsonify({"status": "success"})
     else:
+        print("Unkown error")
         flash("Error: Sync failed.", category="fail")
         return jsonify({"status": "failed"})
 
-@courses_bp.route("/course/delete/<int:course_id>/", methods=["POST"])
+@courses_bp.route("/delete/<int:course_id>/", methods=["POST"])
 @login_required
 def deleteCourse(course_id):
+    print("Deleting...")
     courseRepo = CourseRepo()
     user_id = current_user.user_id
 
@@ -110,12 +114,11 @@ def deleteCourse(course_id):
         flash(f"Unkown Error", category="deleteFail")
         return redirect(url_for("courses.course"))
 
-@courses_bp.route("/course/setweight", methods=["POST"])
+@courses_bp.route("/<int:course_id>/setweight/", methods=["POST"])
 @login_required
-def updateCourseWeight():
+def updateCourseWeight(course_id):
     form = CourseWeightForm()
     if form.validate_on_submit():
-        course_id = form.course_id.data
         weight = form.weight.data
         repo = CourseRepo()
         print(f"Updating Course Weight with: ID: {course_id}, Weight: {weight}")

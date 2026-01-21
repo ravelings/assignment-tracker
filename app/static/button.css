@@ -1,0 +1,139 @@
+:root{
+    --shadow: 0px 2px 2px hsla(0, 0%, 0%, 0.07), 0px 2.5px 2.5px hsla(0, 0%, 0%, 0.10)
+
+    --bg: oklch(0.96 0.01 255);
+    --bg-light: oklch(1 0.01 255);
+
+    --accent: oklch(0.5235 0.0858 224.88);
+    --accent-dark: oklch(0.40 0.0858 224.88);
+    --accent-darker: #193a6b;
+
+    --success: oklch(0.5 0.05 160);
+    --success-light: oklch(0.7 0.05 160);
+
+}
+
+.btn-primary {
+    padding: 0.5rem;
+    font-size: medium;
+    background-color: var(--accent-darker);
+    color: var(--bg);
+    box-shadow: var(--shadow);
+    margin-right: 0rem;
+}
+
+.btn-create {
+    background-color: var(--accent);
+}
+
+.btn-secondary {
+    padding: 0.5rem;
+    margin-left:0.5rem;
+    font-size:medium;
+    box-shadow: var(--shadow);
+}
+
+
+.btn-primary:hover, .btn-primary:disabled {
+    background-color: var(--accent-dark);
+}
+
+.btn-icon {
+    filter: invert(95%);
+    transform: translateY(-5%);
+}
+
+.btn-primary.is-spinning .btn-icon {
+    animation: btn-icon-spin 1s linear infinite;
+}
+
+@keyframes btn-icon-spin {
+    from {
+        transform: translateY(-5%) rotate(0deg);
+    }
+    to {
+        transform: translateY(-5%) rotate(360deg);
+    }
+}
+
+.toast-text{
+    font-size: large;
+    font-weight: bolder;
+}
+
+.toast-body {
+    background-color: var(--success-light);
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+.toast-header {
+    background-color: var(--success);
+}
+
+.btn-group {
+    background-color: var(--bg-dark);
+}
+
+.btn-radio{
+    border: none;
+    padding: 0;
+    margin: 0.25rem;
+    transition: 0.2s ease-out
+}
+
+.btn-check:checked + .btn-radio {
+    background-color: var(--bg-light);
+}
+
+.dropdown{
+    background-color: var(--bg-light);
+    height: 2rem;
+}
+
+.create-tab {
+    background-color: var(--accent);
+    border: 1px solid var(--bg);
+    border-radius: 0.5rem;
+}
+
+.create-btn{
+    background-color: transparent;
+    color: var(--bg);
+}
+
+.create-img{
+    
+    filter: invert(95%);
+}
+
+.delete {
+    background-color: #fdecec;
+    border: 1px solid #facece;
+    border-radius: 0.5rem;
+}
+
+.btn-delete {
+    background-color: #df6262;
+    color: white;
+
+}
+
+.btn-delete:hover {
+    background-color: #df6262ba;
+    color: white;
+
+}
+
+.btn-name {
+    padding: 0.2rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+
+    background-color: #f1f5f9;
+    border: 1px solid #e5ebf2;
+    border-radius: 1rem;
+
+    font-weight: 550;
+    color: #64748b;
+}

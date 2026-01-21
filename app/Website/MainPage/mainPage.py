@@ -7,6 +7,8 @@ from integrations.canvasClient import CanvasClient
 from forms.DeleteAssignment import DeleteAssignment
 from services.scoring_service import ScoringService
 from forms.SubmitForm import SubmitForm
+from forms.assignment import AssignmentCreateForm
+from forms.editAssignmentForm import EditAssignmentForm
 
 mainPage_bp = Blueprint("mainPage", __name__, static_folder="static", template_folder="templates")
 
@@ -14,21 +16,25 @@ mainPage_bp = Blueprint("mainPage", __name__, static_folder="static", template_f
 @login_required
 def dashboard():
     user_id = current_user.user_id
-    repo = AssignmentRepo()
+    assignmentRepo = AssignmentRepo()
+    courseRepo = CourseRepo()
     deleteForm = DeleteAssignment()
+    assignmentForm = AssignmentCreateForm().updateCourseSelect(courseRepo.getAllCoursesById(user_id))
+    editAssignmentForm = EditAssignmentForm()
+
     sort_key = (request.args.get("sort") or "default").strip().lower()
     if sort_key is None:
         sort_key = "default"
 
     SORT_MAP = {
-    "default"   : repo.getAllAssignmentById,
-    "course"      : repo.get_SortedByName_Assignment,
-    "due"       : repo.get_SortedByDue_Assignment,
-    "points"    : repo.get_SortedByPoints_Assignment,
-    "priority"  : repo.getAllAssignmentById # Sort manually after calculation
+    "default"   : assignmentRepo.getAllAssignmentById,
+    "course"      : assignmentRepo.get_SortedByName_Assignment,
+    "due"       : assignmentRepo.get_SortedByDue_Assignment,
+    "points"    : assignmentRepo.get_SortedByPoints_Assignment,
+    "priority"  : assignmentRepo.getAllAssignmentById # Sort manually after calculation
     }
 
-    assignments = SORT_MAP.get(sort_key, repo.getAllAssignmentById)(user_id)
+    assignments = SORT_MAP.get(sort_key, assignmentRepo.getAllAssignmentById)(user_id)
     
     # Calculate scores
     scoring_service = ScoringService(user_id)
@@ -42,7 +48,11 @@ def dashboard():
     if deleteForm.validate_on_submit:
         print(f"Assignment ID: {deleteForm.assignment_id.data}")
 
-    return render_template("dashboard.jinja2", assignments=assignments, deleteForm=deleteForm)
+    return render_template("dashboard.jinja2", 
+                           assignments=assignments, 
+                           deleteForm=deleteForm, 
+                           assignmentForm=assignmentForm,
+                           editForm=editAssignmentForm)
 
 @mainPage_bp.route("/userinfo/")
 @login_required
@@ -67,7 +77,7 @@ def deleteAssignment(assignment_id):
         flash(f"Assignment {assignment_id} deleted successfully", category="deleteTrue")
         return redirect(url_for("mainPage.dashboard"))
     else:
-        flash(f"Failed", category="deleteTrue")
+        flash(f"Failed", category="deleteFalse")
         return redirect(url_for("mainPage.dashboard"))
     
 @mainPage_bp.route("/dashboard/assignments/sync", methods=["POST"])
@@ -100,6 +110,20 @@ def syncAssignments():
         assignmentRepo.createCanvasAssignment(assignments)
     
     return jsonify({"status": "success"})
+
+@mainPage_bp.route("/dashboard/assignments/<int:assignment_id>/edit", methods=["POST"])
+def editAssignment(assignment_id):
+    form = EditAssignmentForm()
+    if form.validate_on_submit():
+        effort = form.effort.data 
+        repo = AssignmentRepo()
+        repo.setEffort(assignment_id, effort)
+        print("Changed successful!")
+    else:
+        print(form.errors)
+    
+    return redirect(url_for("mainPage.dashboard"))
+
 
 @mainPage_bp.route("/test", methods=["GET"])
 def test():

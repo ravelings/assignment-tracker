@@ -1,19 +1,21 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
-from extensions.extensions import db
-from models.settings import Settings
+from repositories.settingsRepo import SettingsRepo
+from forms.setScoreMode import SetScoreMode
 
 settings_bp = Blueprint("settings", __name__, template_folder="templates")
 
 @settings_bp.route("/dashboard/settings", methods=["GET", "POST"])
 @login_required
 def settings():
-    user_settings = Settings.query.filter_by(user_id=current_user.user_id).first()
+    user_id = current_user.user_id
+    repo = SettingsRepo()
+    user_settings = repo.getUserSettings(user_id)
     
+    setScoreModeForm = SetScoreMode()
+
     if not user_settings:
-        user_settings = Settings(user_id=current_user.user_id)
-        db.session.add(user_settings)
-        db.session.commit()
+        user_settings = repo.initSettings(user_id).getUserSettings(user_id)
 
     if request.method == "POST":
         strategy = request.form.get("scoring_strategy")
@@ -26,4 +28,4 @@ def settings():
         
         return redirect(url_for("settings.settings"))
 
-    return render_template("settings.jinja2", settings=user_settings)
+    return render_template("settings.jinja2", settings=user_settings, scoreForm=setScoreModeForm)

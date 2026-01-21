@@ -1,4 +1,6 @@
-<html>
+{% extends 'base.html' %}
+
+{% block content %}
 <title>Create Assignment</title>
 <h1>Create Assignment</h1>
 <div>
@@ -32,7 +34,6 @@
     }
 </script>
 
-{% block content %}
 {%with messages = get_flashed_messages(with_categories=true)%}
 {%if messages%}
 {% for category, msg in messages %}
@@ -44,6 +45,7 @@
 {%endfor%}
 {%endif%}
 {%endwith%}
-{%endblock%}
+
+{% endblock %}
 
 </html>

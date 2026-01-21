@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, FloatField
-from wtforms.validators import InputRequired, Length, NumberRange
+from wtforms import StringField, SubmitField, RadioField
+from wtforms.validators import InputRequired, Length, Optional
 
 class CourseCreateForm(FlaskForm):
     course_name = StringField(
@@ -8,10 +8,12 @@ class CourseCreateForm(FlaskForm):
         render_kw={"placeholder": "Course Name"}
     )
     
-    weight = FloatField(
-        validators=[InputRequired(), NumberRange(min=0.0, max=2.0)],
-        render_kw={"placeholder": "Course Weight (0.0 - 2.0)", "step": "0.1"},
-        default=1.0
+    weight = RadioField(
+        "Course Weight",
+        choices=[(1, "Low"), (2, "Medium"), (3, "High")],
+        coerce=int,
+        validators=[Optional()],
+        default=1
     )
 
     submit = SubmitField("Create Course")

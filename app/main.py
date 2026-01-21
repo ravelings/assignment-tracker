@@ -20,9 +20,9 @@ app.register_blueprint(login_bp, url_prefix="")
 ## main page 
 app.register_blueprint(mainPage_bp, url_prefix="")
 ## assignment
-app.register_blueprint(assignments_bp, url_prefix="/dashboard/")
+app.register_blueprint(assignments_bp, url_prefix="/dashboard/assignment")
 ## course
-app.register_blueprint(courses_bp, url_prefix="/dashboard/")
+app.register_blueprint(courses_bp, url_prefix="/dashboard/course")
 ## scores
 app.register_blueprint(scores_bp, url_prefix="/dashboard/")
 ## settings

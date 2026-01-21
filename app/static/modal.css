@@ -1,0 +1,48 @@
+:root{
+    --bg-darker: oklch(0.92 0.01 255);
+    --bg-dark: oklch(0.94 0.01 255);
+    --bg: oklch(0.96 0.01 255);
+    --bg-light: oklch(1 0.01 255);
+    --bg-header: oklch(0.98 0.01 255);
+
+    --text-muted: oklch(0.55 0.02 255);
+    --text: oklch(0.15 0.02 255);
+
+    
+
+    --border: oklch(0.6 0.02 255);
+    --border-muted: oklch(0.7 0.02 255);
+    --shadow: 0px 2px 2px hsla(0, 0%, 0%, 0.07), 0px 2.5px 2.5px hsla(0, 0%, 0%, 0.10)
+}
+
+.modal-content {
+    box-shadow: var(--shadow);
+
+    border: 2px solid var(--bg);
+    border-radius: 1rem;
+}
+
+.input {
+    border: 0.15rem solid var(--bg-dark);
+    border-radius: 0.5rem;
+}
+
+.icon-add {
+    width: 1rem;
+    height: 1rem;
+}
+
+.heading1 {
+}
+
+.heading0 {
+    color: var(--text);
+    font-weight: 550;
+    font-size: x-large;
+    margin-left: 1rem;
+}
+
+.heading1 {
+    color: var(--text-muted);
+    font-weight: 550;
+}
