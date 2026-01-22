@@ -1,4 +1,5 @@
 from flask import Flask
+from pathlib import Path
 from extensions.extensions import db, loginManager
 from Website.Login.login import login_bp
 from Website.MainPage.mainPage import mainPage_bp
@@ -9,7 +10,9 @@ from Website.Settings.settings import settings_bp
 
 app = Flask(__name__)
 # DB config
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///C:/Users/ravel/Documents/Coding/Assignment Tracker (Antigravity)/assignment-tracker/app/Database/database.db"
+basedir = Path(__file__).resolve().parent
+db_path = basedir / "Database" / "database.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 db.init_app(app)
 # Login Manager
 loginManager.init_app(app)

@@ -7,11 +7,16 @@
     --bg-light: oklch(1 0.01 255);
 }
 
-.text1{
+.text2{
     color: var(--text);
 }
 
 .custom-tooltip {
   --bs-tooltip-bg: var(--bg-dark);
   --bs-tooltip-color: var(--text);
+}
+
+.btn-submit {
+  width: 2rem;
+  height: 2rem;
 }

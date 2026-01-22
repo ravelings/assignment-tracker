@@ -1,12 +1,12 @@
 from flask_wtf import FlaskForm 
-from wtforms import StringField, SubmitField
+from wtforms import PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length
 
 class AddTokenForm(FlaskForm):
 
-    token = StringField(
+    token = PasswordField(
     validators=[InputRequired(), Length(min=1, max=200)],
-    render_kw={"placeholder": "Token"}
+    render_kw={"placeholder": "Enter your Canvas Token"}
     )
 
     submit = SubmitField("Submit")

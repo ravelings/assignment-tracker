@@ -48,7 +48,7 @@ def dashboard():
     if deleteForm.validate_on_submit:
         print(f"Assignment ID: {deleteForm.assignment_id.data}")
 
-    return render_template("dashboard.jinja2", 
+    return render_template("dashboard.html", 
                            assignments=assignments, 
                            deleteForm=deleteForm, 
                            assignmentForm=assignmentForm,
