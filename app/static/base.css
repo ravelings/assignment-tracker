@@ -17,11 +17,28 @@
     display: flex;
     position:relative;
     width: 100%;
-    font-family: "Manrope", sans-serif; 
+    font-family: "Manrope", sans-serif;
+    min-height: 100vh;
+    align-items: stretch;
+}
+
+html, body {
+    min-height: 100%;
+    margin: 0;
+    overscroll-behavior: none;
+}
+
+.main {
+    flex: 1;
+    min-height: 100vh;
 }
 
 .sidebar-div {
     height: 100vh;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    flex-shrink: 0;
 }
 
 .item {

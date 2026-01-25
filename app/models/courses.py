@@ -29,6 +29,12 @@ class Course(db.Model):
         nullable=False
     )
 
+    course_code = db.Column(
+        "course_code",
+        db.Text,
+        nullable=False
+    )
+
     canvas_course_id = db.Column(
         "canvas_course_id",
         db.Integer,
@@ -45,6 +51,12 @@ class Course(db.Model):
         "time_zone",
         db.Text,
         nullable=True
+    )
+    
+    end_at = db.Column(
+        "end_at",
+        db.Text,
+        nullable=False
     )
 
     last_sync = db.Column(
@@ -70,18 +82,22 @@ class Course(db.Model):
         self,
         user_id: int,
         course_name: str,
+        course_code = None,
         canvas_course_id = None,
         workflow_state = None,
         time_zone = None,
+        end_at = None,
         last_sync = None,
         canvas_base_url = None,
         weight: float = 1.0
     ):
         self.user_id = user_id
         self.course_name = course_name
+        self.course_code = course_code
         self.canvas_course_id = canvas_course_id
         self.workflow_state = workflow_state
         self.time_zone = time_zone
+        self.end_at = end_at
         self.last_sync = last_sync
         self.canvas_base_url = canvas_base_url
         self.weight = weight

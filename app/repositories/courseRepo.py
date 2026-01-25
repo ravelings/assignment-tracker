@@ -20,6 +20,12 @@ class CourseRepo:
                 .filter_by(user_id = user_id)
                 .all())
 
+    def getAllCanvasCoursesById(self, user_id):
+        return (Course.query
+                .filter_by(user_id = user_id)
+                .filter(Course.canvas_course_id.isnot(None))
+                .all())
+
     def get_SortedByName_Course(self, user_id):
         return (Course.query
                 .filter_by(user_id = user_id)
@@ -95,7 +101,7 @@ class CourseRepo:
                     workflow_state=course.workflow_state,
                     time_zone=course.time_zone,
                     last_sync=None,
-                    canvas_base_url=None,
+                    canvas_base_url=course.canvas_base_url,
                     weight=course.weight
                 )
                 db.session.add(new_course)
@@ -108,8 +114,6 @@ class CourseRepo:
                         continue
                     elif new_entry != getattr(old_course, field):
                         setattr(old_course, field, new_entry)
-
-                db.session.add(old_course)
         else:
             self.commit()
             return True

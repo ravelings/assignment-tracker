@@ -37,7 +37,7 @@ def setFunction():
         set = repo.setFunction(current_user.user_id, function)
         if set == False:
             print("Unkown error")
-            flash("Unkown Error", "error")
+            flash("Unkown Error", "fail")
             return redirect(url_for("settings.settings"))
         print("Set success")
         flash("Function set successfully", "success")
@@ -56,10 +56,10 @@ def setToken():
         set = repo.setCanvasToken(user_id=current_user.user_id, token=token)
 
         if set:
-            flash("Token set successfully!", category="token")
+            flash("Token set successfully!", category="success")
             return redirect(url_for("settings.settings"))
         else:
-            flash("Token set failed.", category="token")
+            flash("Token set failed.", category="fail")
             return redirect(url_for("settings.settings"))
         
     print(form.errors)

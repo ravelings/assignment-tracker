@@ -33,9 +33,13 @@
     box-shadow: var(--shadow);
 }
 
-
 .btn-primary:hover, .btn-primary:disabled {
     background-color: var(--accent-dark);
+}
+
+.btn-complete:hover {
+    filter: invert(50%);
+    transition: 0.15s ease-in-out;
 }
 
 .btn-icon {
@@ -54,21 +58,6 @@
     to {
         transform: translateY(-5%) rotate(360deg);
     }
-}
-
-.toast-text{
-    font-size: large;
-    font-weight: bolder;
-}
-
-.toast-body {
-    background-color: var(--success-light);
-    border-bottom-left-radius: 0.5rem;
-    border-bottom-right-radius: 0.5rem;
-}
-
-.toast-header {
-    background-color: var(--success);
 }
 
 .btn-group {

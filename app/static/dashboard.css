@@ -154,3 +154,28 @@ th, td {
     visibility: visible;
     pointer-events: auto;
 }
+
+.assignment-table .btn-complete{
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease-in-out;
+}
+
+.assignment-table .table-row:hover .btn-complete{
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.assignment-table .title{
+    position: relative;
+    padding-left: 1.75rem;
+}
+
+.assignment-table .complete-form{
+    position: absolute;
+    top: 50%;
+    left: -0.5rem;
+    transform: translateY(-50%);
+}

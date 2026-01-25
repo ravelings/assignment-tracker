@@ -1,0 +1,44 @@
+:root{
+    --shadow: 0px 2px 2px hsla(0, 0%, 0%, 0.07), 0px 2.5px 2.5px hsla(0, 0%, 0%, 0.10)
+
+    --bg: oklch(0.96 0.01 255);
+    --bg-light: oklch(1 0.01 255);
+
+    --accent: oklch(0.5235 0.0858 224.88);
+    --accent-dark: oklch(0.40 0.0858 224.88);
+    --accent-darker: #193a6b;
+
+    --success: oklch(0.5 0.05 160);
+    --success-light: oklch(0.7 0.05 160);
+
+    --error: #df6262;
+    --error-light: #fdecec;;
+
+}
+
+.toast-text{
+    font-size: large;
+    font-weight: bolder;
+}
+
+.toast-body {
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+}
+
+.toast-success .toast-body {
+    background-color: var(--success-light);
+
+}
+
+.toast-success .toast-header {
+    background-color: var(--success);
+}
+
+.toast-fail .toast-body {
+    background-color: var(--error-light);
+}
+
+.toast-fail .toast-header {
+    background-color: var(--error);
+}

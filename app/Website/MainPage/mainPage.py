@@ -9,6 +9,7 @@ from services.scoring_service import ScoringService
 from forms.SubmitForm import SubmitForm
 from forms.assignment import AssignmentCreateForm
 from forms.editAssignmentForm import EditAssignmentForm
+from forms.checkForm import CheckForm
 
 mainPage_bp = Blueprint("mainPage", __name__, static_folder="static", template_folder="templates")
 
@@ -21,13 +22,15 @@ def dashboard():
     deleteForm = DeleteAssignment()
     assignmentForm = AssignmentCreateForm().updateCourseSelect(courseRepo.getAllCoursesById(user_id))
     editAssignmentForm = EditAssignmentForm()
+    checkForm = CheckForm()
 
-    sort_key = (request.args.get("sort") or "default").strip().lower()
+    sort_key = (request.args.get("sort"))
     if sort_key is None:
-        sort_key = "default"
+        sort_key = "due"
+    else:
+        sort_key = sort_key.strip().lower()
 
     SORT_MAP = {
-    "default"   : assignmentRepo.getAllAssignmentById,
     "course"      : assignmentRepo.get_SortedByName_Assignment,
     "due"       : assignmentRepo.get_SortedByDue_Assignment,
     "points"    : assignmentRepo.get_SortedByPoints_Assignment,
@@ -52,7 +55,8 @@ def dashboard():
                            assignments=assignments, 
                            deleteForm=deleteForm, 
                            assignmentForm=assignmentForm,
-                           editForm=editAssignmentForm)
+                           editForm=editAssignmentForm,
+                           checkForm=checkForm)
 
 @mainPage_bp.route("/userinfo/")
 @login_required
@@ -91,7 +95,7 @@ def syncAssignments():
         flash("Error: Token not set, please set up token before syncing.", category="token")
         return jsonify({"status": "failed"})
     
-    client = CanvasClient(user_id=user_id, token=token, instance="canvas")
+    client = CanvasClient(user_id=user_id, token=token, instance="onu")
     canvasCourses = client.getCourses()
 
     if canvasCourses is None:
@@ -102,12 +106,13 @@ def syncAssignments():
     courseRepo.upsertCanvasCourse(canvasCourses)
 
     assignmentRepo = AssignmentRepo()
-    userCourses = courseRepo.getAllCoursesById(current_user.user_id)
+    userCourses = courseRepo.getAllCanvasCoursesById(current_user.user_id)
     for course in userCourses:
         assignments = client.getAssignmentsByCourse(user_id=current_user.user_id, course=course)
         if assignments is None:
+            print("Assignment is none for {course}")
             continue 
-        assignmentRepo.createCanvasAssignment(assignments)
+        assignmentRepo.createCanvasAssignment(user_id=user_id, canvasAssignment=assignments)
     
     return jsonify({"status": "success"})
 
@@ -122,9 +127,33 @@ def editAssignment(assignment_id):
     else:
         print(form.errors)
     
-    return redirect(url_for("mainPage.dashboard"))
+    return redirect(url_for("mainPage.dashboard")) 
 
+@mainPage_bp.route("/dashboard/assignments/<int:assignment_id>/complete", methods=["POST"])
+def completeAssignment(assignment_id):
+    user_id = current_user.user_id
+    form = CheckForm()
+    if form.validate_on_submit():
+        assignmentRepo = AssignmentRepo()
+        set = assignmentRepo.setStatus(user_id=user_id, assignment_id=assignment_id)
+        if set:
+            print(f"Status set to: True")
+        else:
+            print(f"Status set to: False")
+    else:
+        print(form.errors)
+    return redirect(url_for("mainPage.dashboard"))
+                
 
 @mainPage_bp.route("/test", methods=["GET"])
 def test():
-    return render_template("base.html")
+    repo = UserRepo()
+    client = CanvasClient(user_id=1,token=repo.getCanvasToken(user_id=1), instance="onu")
+
+    course = client.getCourseById(course_id=12637)
+    if course: 
+        print(f"The Assignment is: {client.getAssignmentsByCourse(1, course)}")
+    else:
+        print("Course empty")
+    
+    return render_template("temp.html")

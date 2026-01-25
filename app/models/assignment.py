@@ -22,7 +22,6 @@ class Assignment(db.Model):
     points_possible = db.Column("points_possible", db.Integer, nullable=True)
     score = db.Column("score", db.Float, nullable=True)  # Actual score achieved
     canvas_assignment_id = db.Column("canvas_assignment_id", db.Integer, nullable=True)
-    canvas_course_id = db.Column("canvas_course_id", db.Integer, db.ForeignKey("courses.canvas_course_id"), nullable=True)
     
     workflow_state = db.Column("workflow_state", db.Text, nullable=True)
     unlock_at = db.Column("unlock_at", db.Text, nullable=True)

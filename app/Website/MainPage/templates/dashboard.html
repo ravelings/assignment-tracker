@@ -6,12 +6,20 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='dashboard.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='modal.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='button.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='toast.css') }}">
     <title>Osmos Tracker</title>
 {%  endblock %}
 
     <div class="container h-100 w-100">
 
-        <div class="toast-container position-fixed top-0 end-30 p-3">
+        <button class="btn btn-primary" onclick="createToast('Test', 'toast-success')">
+        Show Success Toast
+        </button>
+        <button class="btn btn-primary" onclick="createToast('Test', 'toast-fail')">
+        Show Fail Toast
+        </button>
+
+        <div class="toast-container position-fixed top-0 end-0 p-3">
             <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="toast-header">
                     <img src="{{ url_for('static', filename='images/icons/sync1.svg') }}" 
@@ -91,7 +99,7 @@
             </div>
             
 
-            <div class="row table-div w-100">
+            <div class="row table-div">
 
                 <table class="assignment-table">
                     <tr>
@@ -104,8 +112,20 @@
 
                     {% for assignment in assignments %}
                         <tr class="table-row">
-                            <td class="title">
-                                <button 
+                            <td class="title d-flex align-items-center">                           
+                                <form method="POST" action="/dashboard/assignments/{{ assignment.assignment_id }}/complete" class="d-flex align-items-center m-0 p-0 complete-form">
+                                    {{checkForm.hidden_tag()}}
+                                    {{checkForm.submit(class_='d-none check-submit-field')}}
+                                    <button
+                                        type="button"
+                                        class="btn btn-complete p-0 m-1 me-2 border-0 bg-transparent"
+                                        title="complete"
+                                        aria-label="Mark assignment complete"
+                                        onclick="this.closest('form').querySelector('.check-submit-field').click();">
+                                        <img src="{{ url_for('static', filename='images/icons/check1.svg') }}" alt="Complete icon">
+                                    </button>
+                                </form>
+                                <button
                                     class="btn-name" 
                                     onclick=showEditModal(this)
                                     data-assignment-id="{{assignment.assignment_id}}"
@@ -130,6 +150,7 @@
                                 </button>
                             </td>
                         </tr>
+                    </div>
                     {% endfor %}
                     <tr>
                         <td>test1</td>
@@ -287,6 +308,7 @@
 
 {% block scripts %}
 <script>
+
     const modal = document.getElementById("exampleModal");
     const body = modal.querySelector(".modal-body");
 
@@ -369,31 +391,24 @@ if (alertTrigger) {
     }
 
     function syncFail() {
-        const host = document.getElementById("alert")
-        host.innerHTML = `
-        <div class="alert alert-danger" role="alert">
-            Sync failed!
-        </div>
-        `;
+        showToast("Sync failed!", "toast-fail")
     }
 
     function syncSuccess() {
-        const host = document.getElementById("alert")
-        host.innerHTML = `
-        <div class="alert alert-success" role="alert">
-            Sync success! Refreshing page...
-        </div>
-        `;
+        showToast("Sync successful!", "toast-success")
     }
 
-    function showToast(message) {
+    function createToast(message, type) {
         const toastLiveExample = document.getElementById('liveToast');
+        toastLiveExample.setAttribute("class", `toast ${type}`);
 
         const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
         const text_body = document.getElementById("toast-body");
 
         text_body.innerHTML = message;
         toastBootstrap.show();
+        setTimeout(5000);
+
     }
 
     async function sync() {
@@ -409,18 +424,20 @@ if (alertTrigger) {
 
             const contentType = result.headers.get("Content-Type") || "";
             if (!contentType.includes("application/json")) {
-                alert("Login session invalid, please login again");
+                createToast("Token invalid! Please set token in settings before retrying.", "toast-fail")
+                setTimeout(() => location.reload(), 3000);
                 return;
             }
 
             const data = await result.json();
 
             if (!result.ok || data.status !== "success") {
-                showToast("Sync failed!")
+                syncFail()
+                setTimeout(() => location.reload(), 3000);
                 return;
             }
 
-            showToast("Sync Success! Refreshing...")
+            syncSuccess()
 
             setTimeout(() => location.reload(), 3000);
         }
@@ -434,17 +451,17 @@ if (alertTrigger) {
         {% for category, msg in messages %}
             {% if category == "deleteTrue" %}
                 <script>
-                    createAlert({{ msg| tojson }}, "success");
+                    createToast({{ msg| tojson }}, "toast-success");
                 </script>
             {%endif%}
             {% if category == "deleteFalse" %}
                 <script>
-                    createAlert({{ msg| tojson }}, "danger");
+                    createToast({{ msg| tojson }}, "toast-fail");
                 </script>
             {%endif%}
             {% if category == "token" %}
                 <script>
-                    createAlert({{ msg| tojson }}, "warning");
+                    createToast({{ msg| tojson }}, "toast-fail");
                 </script>
             {%endif%}
         {%endfor%}
@@ -452,4 +469,3 @@ if (alertTrigger) {
     {%endwith%}
 {% endblock %}
 {% endblock %}
-
