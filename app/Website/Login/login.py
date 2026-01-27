@@ -62,3 +62,26 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for("login.login"))
+
+def loginWithGoogle():
+    token_handler = request.form 
+    cred = token_handler["credential"]
+    cookie = (request.cookies)["g_csrf_token"]
+    token = token_handler["g_csrf_token"]
+    if token is None:
+        return 
+    elif cookie is None: 
+        return 
+    elif token != cookie:
+        return
+    
+    try:
+        idinfo = id_token.verify_oauth2_token(cred, requests.Request(), client_id)
+
+        print(f"ID Info: {idinfo}")
+        google_id = idinfo['sub']
+
+    except ValueError:
+        raise "Invalid Token"
+    
+    return redirect(url_for("settings.settings"))

@@ -56,7 +56,7 @@
 
                 <div class="card">
                     <p class="card-header1">Completed</p>
-                    <p class="card-number">45</p>
+                    <p class="card-number">{{completed}}</p>
                     <div class="tally">
                         <p class="card-tally-completed">+1 today</p>
                     </div>
@@ -138,7 +138,19 @@
                                 </button>
                             </td>
                             <td><a class="course-name">{{assignment.course.course_name}}</a></td>
-                            <td>{{assignment.due}}</td>
+                                {% if assignment.due_hour is none %}
+                                    <td>{{assignment.due_display}}</td>
+                                {% elif assignment.due_hour == "overdue" and assignment.status != 1 %}
+                                    <td class="due-24">{{assignment.due_display}}</td>
+                                {% elif assignment.due_hour is string %}
+                                    <td>{{assignment.due_display}}</td>
+                                {% elif assignment.due_hour < 24 %}
+                                    <td class="due-24">{{assignment.due_display}}</td>
+                                {% elif assignment.due_hour < 72 %}
+                                    <td class="due-72">{{assignment.due_display}}</td>
+                                {% else %}
+                                    <td>{{assignment.due_display}}</td>
+                                {% endif %}
                             <td class="priority">{{"%.2f"|format(assignment.priority_score)}}</td>
                             <td class="status d-flex align-items-center">
                                 {{assignment.status}}
@@ -391,11 +403,11 @@ if (alertTrigger) {
     }
 
     function syncFail() {
-        showToast("Sync failed!", "toast-fail")
+        createToast("Sync failed!", "toast-fail")
     }
 
     function syncSuccess() {
-        showToast("Sync successful!", "toast-success")
+        createToast("Sync successful!", "toast-success")
     }
 
     function createToast(message, type) {
@@ -407,7 +419,6 @@ if (alertTrigger) {
 
         text_body.innerHTML = message;
         toastBootstrap.show();
-        setTimeout(5000);
 
     }
 
@@ -440,6 +451,7 @@ if (alertTrigger) {
             syncSuccess()
 
             setTimeout(() => location.reload(), 3000);
+            return;
         }
         finally {
         }

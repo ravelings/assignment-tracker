@@ -50,6 +50,23 @@
                 <p class="text2">Don't have an account?</p>
                 <a href="{{ url_for('login.register') }}" class="hyperlink">Create an Account</a>
             </div>
+                <script src="https://accounts.google.com/gsi/client" async></script>
+                <div id="g_id_onload"
+                    data-client_id="191762128708-5mo6v6td9hseta7244b9gjbubonssqhu.apps.googleusercontent.com"
+                    data-ux_mode="popup"
+                    data-login_uri="http://localhost:5000/dashboard/settings/auth/google"
+                    data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin w-auto"
+                    data-type="standard"
+                    data-size="large"
+                    data-width="200"
+                    data-theme="outline"
+                    data-text="sign_in_with"
+                    data-shape="rectangular"
+                    data-logo_alignment="left">
+                </div>
+            </div>
         </div>
     </div>
     <!-- Bootstrap JS dependencies -->

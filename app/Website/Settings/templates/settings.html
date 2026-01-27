@@ -9,10 +9,9 @@
 {% block content %}
 
 <div class="container">
-
     <button class="btn btn-primary" id="successToastBtn" onclick="createToast('Success', 'toast-success')">Show Success Toast</button>
     <button class="btn btn-primary" id="successToastBtn" onclick="createToast('Fail', 'toast-fail')">Show Fail Toast</button>
-
+    <button class="btn btn-primary" href="{{ url_for('settings.calendarTest') }}">Calendar Test</button>
     <div class="toast-container position-fixed top-0 end-0 p-3">
     <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
@@ -75,9 +74,13 @@
                 {{scoreForm.submit(class_="btn btn-primary", id="submit1")}}
             </form>
         </div>
-        <h1 class="heading1">Integrations</h1>
+        <h1 class="heading1 mb-1 mt-1">Integrations</h1>
         <div class="row" id="integrations">
-            <form method="POST" action="{{url_for('settings.setToken')}}">
+            <div>
+                <button onclick="client.requestCode();">Authorize with Google</button>
+            </div>
+
+            <form method="POST" action="{{ url_for('settings.authGoogle', _external=True, _scheme='http') }}">
                 {{tokenForm.csrf_token(id='tokenForm_csrf_token')}}
                 <div class="row w-auto align-items-center">
                     <span class="pr-1 w-auto">Canvas Token</span>
@@ -89,7 +92,7 @@
                 </div>
             </form>
         </div>
-        <div class="row" id="logout">
+        <div class="row mt-2" id="logout">
             <button class="btn btn-primary w-auto">
                 <img src="{{ url_for('static', filename='images/icons/logout.svg') }}">
                 Logout from Account
@@ -101,6 +104,7 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://accounts.google.com/gsi/client"></script>
 <script>
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
@@ -115,6 +119,24 @@
         toastBody.innerHTML = message;
         toastBootstrap.show()
     }
+
+    const client = google.accounts.oauth2.initCodeClient({
+    client_id: '191762128708-5mo6v6td9hseta7244b9gjbubonssqhu.apps.googleusercontent.com',
+    scope: 'https://www.googleapis.com/auth/calendar',
+    ux_mode: 'popup',
+    callback: (response) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', "http://localhost:5000/dashboard/settings/auth/google", true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        // Set custom header for CRSF
+        xhr.setRequestHeader('X-Requested-With', 'XmlHttpRequest');
+        xhr.onload = function() {
+        console.log('Auth code response: ' + xhr.responseText);
+        };
+        xhr.send('code=' + response.code);
+    },
+    });
+
 </script>
 {%with messages = get_flashed_messages(with_categories=true)%}
     {%if messages%}

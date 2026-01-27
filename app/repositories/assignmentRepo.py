@@ -183,7 +183,9 @@ class AssignmentRepo:
         assignment = Assignment.query.filter_by(user_id=user_id, assignment_id=assignment_id).first()
         if assignment.status == 0:
             assignment.status = 1
+            self.commit()
+            return True
         else:
             assignment.status = 0
-        
-        self.commit()
+            self.commit()
+            return False   

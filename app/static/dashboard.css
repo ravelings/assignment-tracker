@@ -179,3 +179,12 @@ th, td {
     left: -0.5rem;
     transform: translateY(-50%);
 }
+
+.due-24 {
+    background-color: #facece;
+    font-weight: 600;
+}
+
+.due-72 {
+    background-color: #faf6ce;
+}

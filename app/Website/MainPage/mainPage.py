@@ -1,5 +1,6 @@
 from flask import render_template, Blueprint, request, flash, redirect, url_for, jsonify
 from flask_login import login_required, current_user, logout_user
+from datetime import datetime, date, timezone
 from repositories.userRepo import UserRepo
 from repositories.assignmentRepo import AssignmentRepo
 from repositories.courseRepo import CourseRepo
@@ -13,12 +14,65 @@ from forms.checkForm import CheckForm
 
 mainPage_bp = Blueprint("mainPage", __name__, static_folder="static", template_folder="templates")
 
+def _parse_due_datetime(due_value):
+    if not due_value:
+        return None
+    if isinstance(due_value, datetime):
+        return due_value if due_value.tzinfo else due_value.replace(tzinfo=timezone.utc)
+    if isinstance(due_value, date):
+        return datetime.combine(due_value, datetime.min.time(), tzinfo=timezone.utc)
+    if isinstance(due_value, str):
+        normalized = due_value.strip()
+        if not normalized:
+            return None
+        if normalized.endswith("Z"):
+            normalized = f"{normalized[:-1]}+00:00"
+        try:
+            parsed = datetime.fromisoformat(normalized)
+        except ValueError:
+            try:
+                parsed_date = date.fromisoformat(normalized)
+            except ValueError:
+                return None
+            parsed = datetime.combine(parsed_date, datetime.min.time())
+        return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+    return None
+
+def format_due_display(due_value):
+    due_dt = _parse_due_datetime(due_value)
+    if due_dt is None:
+        return "No due date", None
+
+    now = datetime.now(timezone.utc)
+    delta_seconds = (due_dt - now).total_seconds()
+
+    if delta_seconds >= 0:
+        days = int(delta_seconds // 86400)
+        if days == 0:
+            hours = int(delta_seconds // 3600)
+            return f"in {hours} hours", hours
+        if days == 1:
+            return "in 1 day", days * 24
+        if days < 7:
+            return f"in {days} days", days * 24
+    else:
+        days_overdue = int(abs(delta_seconds) // 86400)
+        if days_overdue == 0:
+            return "overdue", "overdue"
+        if days_overdue == 1:
+            return "overdue by 1 day", "overdue"
+        if days_overdue < 7:
+            return f"overdue by {days_overdue} days", "overdue"
+
+    return due_dt.strftime("%b %d, %Y"), None
+
 @mainPage_bp.route("/dashboard/", methods=["POST", "GET"])
 @login_required
 def dashboard():
     user_id = current_user.user_id
     assignmentRepo = AssignmentRepo()
     courseRepo = CourseRepo()
+    userRepo = UserRepo()
     deleteForm = DeleteAssignment()
     assignmentForm = AssignmentCreateForm().updateCourseSelect(courseRepo.getAllCoursesById(user_id))
     editAssignmentForm = EditAssignmentForm()
@@ -44,6 +98,7 @@ def dashboard():
     for assignment in assignments:
         # assignment.course is available via relationship
         assignment.priority_score = scoring_service.calculate_score(assignment, assignment.course)
+        assignment.due_display, assignment.due_hour = format_due_display(assignment.due)
 
     if sort_key == "priority":
         assignments.sort(key=lambda x: x.priority_score, reverse=True)
@@ -51,7 +106,10 @@ def dashboard():
     if deleteForm.validate_on_submit:
         print(f"Assignment ID: {deleteForm.assignment_id.data}")
 
+    completed = userRepo.getComplete(user_id)
+
     return render_template("dashboard.html", 
+                           completed=completed,
                            assignments=assignments, 
                            deleteForm=deleteForm, 
                            assignmentForm=assignmentForm,
@@ -135,11 +193,14 @@ def completeAssignment(assignment_id):
     form = CheckForm()
     if form.validate_on_submit():
         assignmentRepo = AssignmentRepo()
+        userRepo = UserRepo()
         set = assignmentRepo.setStatus(user_id=user_id, assignment_id=assignment_id)
         if set:
             print(f"Status set to: True")
+            userRepo.incrementComplete(user_id)
         else:
             print(f"Status set to: False")
+            userRepo.decrementComplete(user_id)
     else:
         print(form.errors)
     return redirect(url_for("mainPage.dashboard"))
