@@ -10,8 +10,6 @@ from pathlib import Path
 from oauthlib.oauth2 import OAuth2Error
 from services.googleCalendar import GoogleCalendar
 
-
-
 calendar_bp = Blueprint("calendar", __name__, template_folder="templates")
 
 @calendar_bp.route("/dashboard/calendar/", methods=["GET", "POST"])

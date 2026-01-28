@@ -49,6 +49,7 @@ class AssignmentRepo:
             filtered = self.filterAssignmentByCanvasId(user_id, assignments=canvasAssignment)
             if filtered:
                 db.session.add_all(filtered)
+                return filtered
         else:
             already_exist = Assignment.query.filter_by(user_id, canvas_assignment_id=canvasAssignment.canvas_assignment_id).all()
             if already_exist is not None:
@@ -57,6 +58,7 @@ class AssignmentRepo:
             
             print("Adding assignment...")
             db.session.add(canvasAssignment)
+            return canvasAssignment
 
         print("Commiting...")
         self.commit()
@@ -189,3 +191,9 @@ class AssignmentRepo:
             assignment.status = 0
             self.commit()
             return False   
+    
+    def set_event_id(self, user_id, assignment_id, event_id):
+        assignment = Assignment.query.filter_by(user_id=user_id, assignment_id=assignment_id).first()
+        assignment.event_id = event_id 
+        self.commit()
+        return

@@ -2,6 +2,7 @@ import datetime
 import json
 
 from repositories.userRepo import UserRepo
+from repositories.assignmentRepo import AssignmentRepo
 
 from pathlib import Path
 from google.auth.transport.requests import Request
@@ -19,6 +20,8 @@ class GoogleCalendar():
         self.scopes = self._parse_scopes(userObject.granted_scopes)
         self.expiry = self._parse_expiry(userObject.expiry)
         self.now = datetime.datetime.now(tz=datetime.timezone.utc)
+        
+        self.storage = [] # stores temp event resources for update mechanic
 
         if not self.token or not self.expiry:
             raise ValueError("Missing Google OAuth token or expiry; user must connect Google first.")
@@ -116,28 +119,8 @@ class GoogleCalendar():
         except HttpError as e:
             print(f"An error has occured: {e}")
 
-    def create_assignment_event(self, due_date):
-        dt = datetime.datetime.fromisoformat(due_date)
-        if dt.tzinfo is None:
-            dt = dt.replace(tzinfo=datetime.timezone.utc)
-        event = {
-        'summary': 'Test Event',
-        'description': 'Osmos Tracker Test',
-        'start': {
-            'dateTime': dt.isoformat(),
-            'timeZone': 'UTC',
-        },
-        'end': {
-            'dateTime': (dt + datetime.timedelta(hours=1)).isoformat(),
-            'timeZone': 'UTC',
-        },
-        'reminders': {
-            'useDefault': False,
-            'overrides': [
-            {'method': 'popup', 'minutes': 24 * 60},
-            ],
-        },
-        }
+    def create_assignment_event(self, assignment):
+        event = self._create_assignment_body(assignment)
         for attempt in range(2):
             try:
                 userRepo = UserRepo()
@@ -168,4 +151,135 @@ class GoogleCalendar():
             print("Creating event failed after 2 attempts")
             raise Exception("Creating event failed after 2 attempts")
 
+    def _create_update_body(self, assignment):
+        dt = datetime.datetime.fromisoformat(assignment.due)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        event = {
+        'summary': f"{assignment.title} | {assignment.course.course_name}",
+        'description': assignment.desc,
+        'start': {
+            'dateTime': dt.isoformat(),
+            'timeZone': 'UTC',
+        },
+        'end': {
+            'dateTime': (dt + datetime.timedelta(hours=1)).isoformat(),
+            'timeZone': 'UTC', 
+        }
+       }
         
+        return event
+
+    def _create_assignment_body(self, assignment):
+        due_date = assignment.due
+        title = assignment.title
+        desc = assignment.description
+        request_id = assignment.id
+        course = assignment.course.course_name
+
+        dt = datetime.datetime.fromisoformat(due_date)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=datetime.timezone.utc)
+        event = {
+        'summary': f"{title} | {course}",
+        'description': desc,
+        'start': {
+            'dateTime': dt.isoformat(),
+            'timeZone': 'UTC',
+        },
+        'end': {
+            'dateTime': (dt + datetime.timedelta(hours=1)).isoformat(),
+            'timeZone': 'UTC',
+        },
+        'reminders': {
+            'useDefault': False,
+            'overrides': [
+            {'method': 'popup', 'minutes': 24 * 60},
+            ],
+        },
+        }
+
+        return event, request_id
+        
+    def _handle_batch(self, request_id, response, exception):
+        if exception is not None:
+            print(f"Event Assignment {request_id} failed!")
+            print(f"Status: {exception.resp.status}, Error: {exception}")
+            return 
+        event_id = response['id']
+        assignmentRepo = AssignmentRepo()
+        assignmentRepo.set_event_id(user_id=self.user_id, 
+                                    assignment_id=request_id, 
+                                    event_id=event_id)
+        return
+
+    def batch_create_event(self, assignment_list):
+        try:
+            userRepo = UserRepo()
+            calendar_id = userRepo.get_calendar_id(user_id=self.user_id)
+            service = build("calendar", "v3", credentials=self.cred)
+            batch = service.new_batch_http_request()
+
+            for assignment in assignment_list:
+                event, request_id = self._create_assignment_body(assignment)
+                batch.add(service.events().insert(calendarId=calendar_id, body=event), 
+                          request_id=request_id,
+                          callback=self._handle_batch)
+            else:
+                batch.execute()
+
+        except HttpError as e:
+            print(f"An error has occured: {e}")
+            status = e.resp.status 
+            
+            if status == 404:   # calendar not found / deleted
+                print("Calendar not found... creating")
+                self.create_calendar()
+                
+            if status == 403: # OAuth failure
+                print("OAuth error")
+                raise Exception("OAuth error")
+            if status == 400:
+                print("Bad request")
+                raise Exception("Bad request: invalid information")
+            else:
+                print("Unkown Error")
+                raise Exception("Unkown Error")
+            
+    def batch_update_event(self, assignment_list):
+        try:
+            userRepo = UserRepo()
+            calendar_id = userRepo.get_calendar_id(user_id=self.user_id)
+            service = build("calendar", "v3", credentials=self.cred)
+            batch = service.new_batch_http_request()
+
+            for assignment in assignment_list:
+                event_id = assignment.event_id
+                if event_id is None:
+                    continue
+
+                event = self._create_update_body(assignment)
+                batch.add(service.events().get(calendarId=calendar_id, eventId=event_id, body=event), 
+                          request_id=assignment.assignment_id,
+                          callback=self._handle_batch)
+            else:
+                batch.execute()
+
+        except HttpError as e:
+            print(f"An error has occured: {e}")
+            status = e.resp.status 
+            
+            if status == 404:   # calendar not found / deleted
+                print("Calendar not found... creating")
+                self.create_calendar()
+                
+            if status == 403: # OAuth failure
+                print("OAuth error")
+                raise Exception("OAuth error")
+            if status == 400:
+                print("Bad request")
+                raise Exception("Bad request: invalid information")
+            else:
+                print("Unkown Error")
+                raise Exception("Unkown Error")
+

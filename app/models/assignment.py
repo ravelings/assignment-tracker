@@ -31,6 +31,8 @@ class Assignment(db.Model):
     last_canvas_sync = db.Column("last_canvas_sync", db.Text, nullable=True)
     effort = db.Column("effort", db.Integer, nullable=True, default=1) # 1=Low, 2=Med, 3=High
 
+    event_id = db.Column("event_id", db.Text, nullable=True)
+
     def __init__(
         self,
         user_id: int,
@@ -51,7 +53,8 @@ class Assignment(db.Model):
         submission_type=None,
         canvas_base_url=None,
         last_canvas_sync=None,
-        effort=1
+        effort=1,
+        event_id=None
     ):
         self.user_id = user_id
         self.course_id = course_id
@@ -72,3 +75,4 @@ class Assignment(db.Model):
         self.canvas_base_url = canvas_base_url
         self.last_canvas_sync = last_canvas_sync
         self.effort = effort
+        self.event_id=event_id

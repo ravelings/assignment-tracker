@@ -64,7 +64,7 @@ class UserRepo:
     
     def get_calendar_id(self, user_id):
         return (User.query.filter_by(user_id=user_id).first()).calendar_id
-
+        
     def setCanvasToken(self, user_id, token):
         user = User.query.filter_by(user_id=user_id).first()
 

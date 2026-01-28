@@ -12,6 +12,8 @@ from forms.assignment import AssignmentCreateForm
 from forms.editAssignmentForm import EditAssignmentForm
 from forms.checkForm import CheckForm
 
+from services.googleCalendar import GoogleCalendar
+
 mainPage_bp = Blueprint("mainPage", __name__, static_folder="static", template_folder="templates")
 
 def _parse_due_datetime(due_value):
@@ -147,6 +149,8 @@ def deleteAssignment(assignment_id):
 def syncAssignments():
     userRepo = UserRepo()
     user_id = current_user.user_id
+    user = userRepo.getUserById(user_id)
+
     token = userRepo.getCanvasToken(user_id)
 
     if token is None:
@@ -165,13 +169,24 @@ def syncAssignments():
 
     assignmentRepo = AssignmentRepo()
     userCourses = courseRepo.getAllCanvasCoursesById(current_user.user_id)
+
+    if user.calendar_id is not None:
+        calendar = GoogleCalendar(user)
+    else:
+        calendar = None
+    assignment_list = []
+
     for course in userCourses:
         assignments = client.getAssignmentsByCourse(user_id=current_user.user_id, course=course)
         if assignments is None:
             print("Assignment is none for {course}")
             continue 
-        assignmentRepo.createCanvasAssignment(user_id=user_id, canvasAssignment=assignments)
+        filtered_assignments = assignmentRepo.createCanvasAssignment(user_id=user_id, canvasAssignment=assignments)
+        assignment_list.extend(filtered_assignments)
     
+    if calendar is not None:
+        calendar.batch_create_event(assignment_list)
+
     return jsonify({"status": "success"})
 
 @mainPage_bp.route("/dashboard/assignments/<int:assignment_id>/edit", methods=["POST"])
