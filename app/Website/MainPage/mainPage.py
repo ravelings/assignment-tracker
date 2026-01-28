@@ -170,23 +170,22 @@ def syncAssignments():
     assignmentRepo = AssignmentRepo()
     userCourses = courseRepo.getAllCanvasCoursesById(current_user.user_id)
 
-    if user.calendar_id is not None:
-        calendar = GoogleCalendar(user)
-    else:
-        calendar = None
-    assignment_list = []
+    # If user has Google Calendar
+    calendar = GoogleCalendar(user) if user.calendar_id else None
 
     for course in userCourses:
         assignments = client.getAssignmentsByCourse(user_id=current_user.user_id, course=course)
         if assignments is None:
             print("Assignment is none for {course}")
             continue 
-        filtered_assignments = assignmentRepo.createCanvasAssignment(user_id=user_id, canvasAssignment=assignments)
-        assignment_list.extend(filtered_assignments)
+        ## returns new assignments and changed assignments
+        new, changed = assignmentRepo.createCanvasAssignment(user_id=user_id, canvasAssignment=assignments)
     
     if calendar is not None:
-        calendar.batch_create_event(assignment_list)
-
+        if new is not None:
+            calendar.batch_create_event(new)
+        if changed is not None:
+            calendar.batch_update_event(changed)
     return jsonify({"status": "success"})
 
 @mainPage_bp.route("/dashboard/assignments/<int:assignment_id>/edit", methods=["POST"])

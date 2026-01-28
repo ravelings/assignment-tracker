@@ -153,8 +153,11 @@ class GoogleCalendar():
 
     def _create_update_body(self, assignment):
         dt = datetime.datetime.fromisoformat(assignment.due)
+        # creates timezone info
         if dt.tzinfo is None:
             dt = dt.replace(tzinfo=datetime.timezone.utc)
+        
+        # body to be upserted into old event
         event = {
         'summary': f"{assignment.title} | {assignment.course.course_name}",
         'description': assignment.desc,
@@ -166,7 +169,7 @@ class GoogleCalendar():
             'dateTime': (dt + datetime.timedelta(hours=1)).isoformat(),
             'timeZone': 'UTC', 
         }
-       }
+        }
         
         return event
 
@@ -202,10 +205,12 @@ class GoogleCalendar():
         return event, request_id
         
     def _handle_batch(self, request_id, response, exception):
+        # request ID = Assignment ID
         if exception is not None:
             print(f"Event Assignment {request_id} failed!")
             print(f"Status: {exception.resp.status}, Error: {exception}")
             return 
+        # creates/updates event ID for assignment
         event_id = response['id']
         assignmentRepo = AssignmentRepo()
         assignmentRepo.set_event_id(user_id=self.user_id, 
@@ -223,8 +228,8 @@ class GoogleCalendar():
             for assignment in assignment_list:
                 event, request_id = self._create_assignment_body(assignment)
                 batch.add(service.events().insert(calendarId=calendar_id, body=event), 
-                          request_id=request_id,
-                          callback=self._handle_batch)
+                        request_id=request_id,
+                        callback=self._handle_batch)
             else:
                 batch.execute()
 
@@ -255,13 +260,14 @@ class GoogleCalendar():
 
             for assignment in assignment_list:
                 event_id = assignment.event_id
+                # if assignment does not exist on calendar, skip
                 if event_id is None:
                     continue
-
+    
                 event = self._create_update_body(assignment)
                 batch.add(service.events().get(calendarId=calendar_id, eventId=event_id, body=event), 
-                          request_id=assignment.assignment_id,
-                          callback=self._handle_batch)
+                        request_id=assignment.assignment_id,
+                        callback=self._handle_batch)
             else:
                 batch.execute()
 

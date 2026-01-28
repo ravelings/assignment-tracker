@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from extensions.extensions import db
 from models.assignment import Assignment
 from models.courses import Course
@@ -31,37 +33,87 @@ class AssignmentRepo:
         db.session.add(assignment)
         self.commit()
 
-    def filterAssignmentByCanvasId(self, user_id, assignments):
-        filtered = []
-        for assignment in assignments:
-                already_exist = Assignment.query.filter_by(user_id=user_id, canvas_assignment_id=assignment.canvas_assignment_id).all()
-                if len(already_exist) == 0:
-                    print("Filtered.")
-                    filtered.append(assignment)
-                else: 
-                    print("Assigment exists already")
+    def _compare_assignment(self, new_assignment, db_assignment):
+        modified = False
+        db_due = datetime.fromisoformat(db_assignment.due) if db_assignment.due is None else None
+        new_due = datetime.fromisoformat(new_assignment.due) if new_assignment.due is None else None
+        # if both due dates exist
+        if db_due is not None and new_due is not None:
+            db_assignment.due = new_assignment.due
+            modified = True
+        # if due date is set
+        elif new_due is not None:
+            db_due = new_due 
+            modified = True 
+        # if due date is unset
+        elif db_due is not None:
+            new_due = db_due 
+            modified = True
+            
+        if db_assignment.title != new_assignment.title:
+            db_assignment.title = new_assignment.title 
+            modified = True
+        if db_assignment.description != new_assignment.description:
+            db_assignment.description = new_assignment.description
+            modified = True
         
-        return filtered
+        return db_assignment if modified else None
+        
+            
+
+    def _batch_filter_assignment(self, user_id, assignments):
+        new_assignment = []
+        changed_assignment = []
+        for assignment in assignments:
+                db_assignment = Assignment.query.filter_by(user_id=user_id, canvas_assignment_id=assignment.canvas_assignment_id).one_or_none()
+                # if assignment not in db
+                if db_assignment is None:
+                    print("New Assignment")
+                    new_assignment.append(assignment)
+                else: 
+                    print("Assigment exists already. Checking changes...")
+                    compared = self._compare_assignment(new_assignment=assignment, db_assignment=db_assignment)
+                    # if assignment changed, then append to changed 
+                    if compared: changed_assignment.append(compared)
+
+        return new_assignment, changed_assignment
 
     def createCanvasAssignment(self, user_id, canvasAssignment):
+        # if a list is inputted, batch filtering is called
         print("Creating canvas assignment...")
         if isinstance(canvasAssignment, (list, tuple)):
-            filtered = self.filterAssignmentByCanvasId(user_id, assignments=canvasAssignment)
-            if filtered:
-                db.session.add_all(filtered)
-                return filtered
+            new_assignments, changed_assignments = self._batch_filter_assignment(user_id, assignments=canvasAssignment)
+            # if new assignments are created
+            if len(new_assignments) > 0:
+                db.session.add_all(new_assignments)
+                print("Addubg new assignments...")
+            # if new assignment created or assignments changed, commit
+            if len(new_assignments) > 0 or len(changed_assignments) > 0:
+                print("Committing...")
+                self.commit()
+            # return a list of new assignments and changed assignments for Google Calendar 
+            return new_assignments, changed_assignments
+        # single assignment object 
         else:
-            already_exist = Assignment.query.filter_by(user_id, canvas_assignment_id=canvasAssignment.canvas_assignment_id).all()
-            if already_exist is not None:
-                print("Assignment already exists")
-                return
+            db_assignment = Assignment.query.filter_by(user_id=user_id, canvas_assignment_id=canvasAssignment.canvas_assignment_id).one_or_none()
+            if db_assignment is not None:
+                print("Assignment already exists, comparing...")
+                # compare db vs new
+                db_assignment = self._compare_assignment(new_assignment=canvasAssignment, 
+                                                        db_assignment=db_assignment)
+                # if changed
+                if db_assignment is not None:
+                    self.commit()
+                    # return changed assignment
+                    return db_assignment
             
             print("Adding assignment...")
             db.session.add(canvasAssignment)
+            self.commit()
+            # return new assignment 
             return canvasAssignment
 
-        print("Commiting...")
-        self.commit()
+        
 
     def moveCompleted(self, assignment_list):
         active = [a for a in assignment_list if a.status != 1]
