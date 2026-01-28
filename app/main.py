@@ -7,6 +7,7 @@ from Website.Assignments.assignmentManager import assignments_bp
 from Website.Courses.courseManager import courses_bp
 from Website.Scores.scoreManager import scores_bp
 from Website.Settings.settings import settings_bp
+from Website.Calendar.calendar import calendar_bp
 
 app = Flask(__name__)
 # DB config
@@ -26,6 +27,8 @@ app.register_blueprint(mainPage_bp, url_prefix="")
 app.register_blueprint(assignments_bp, url_prefix="/dashboard/assignment")
 ## course
 app.register_blueprint(courses_bp, url_prefix="/dashboard/course")
+## calendar
+app.register_blueprint(calendar_bp, url_prefix="")
 ## scores
 app.register_blueprint(scores_bp, url_prefix="/dashboard/")
 ## settings
