@@ -132,7 +132,8 @@
                                     data-canvas-id="{{assignment.canvas_assignment_id}}"
                                     data-assignment-name="{{assignment.title}}"
                                     data-assignment-desc="{{assignment.description}}"
-                                    data-effort="{{assignment.effort}}">
+                                    data-effort="{{assignment.effort}}"
+                                    data-url="{{assignment.html_url}}">
 
                                     {{assignment.title}}
                                 </button>
@@ -286,7 +287,7 @@
         <div class="modal-content container-fluid">
                 <div class="col w-auto p-auto">
                     <div class="header1 modal-header w-auto">
-                        <h1 class="modal-title fs-5 pb-1 w-auto" id="modalTitle"> </h1>
+                        <h1 class="modal-title fs-5 pb-1 w-auto" id="modalTitle"></h1>
                         <div class="ms-auto" id="canvasStatus"> </div>
                         <button type="button" class="btn-close w-auto mr-1" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
@@ -359,6 +360,8 @@ if (alertTrigger) {
     function showEditModal(button) {
         const assignment_id = button.dataset.assignmentId;
         const assignment_name = button.dataset.assignmentName;
+        const assignment_url = button.dataset.url
+        console.log(assignment_url)
         const canvas_id = button.dataset.canvasId;
         const desc = button.dataset.assignmentDesc;
         const effort = button.dataset.effort;
@@ -369,7 +372,10 @@ if (alertTrigger) {
         const title = body.querySelector("#modalTitle")
         const descBody = body.querySelector('#desc')
         const isCanvas = body.querySelector("#canvasStatus")
-        title.innerHTML = [`${assignment_name}`]
+        title.innerHTML = [`
+        <a href="${assignment_url}">
+        ${assignment_name}
+        </a>`]
         descBody.innerHTML = [`<strong class="heading1 mb-1 mt-3">Description:</strong> ${desc}`]
 
         if (canvas_id == null) {

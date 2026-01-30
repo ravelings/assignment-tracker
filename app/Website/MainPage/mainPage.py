@@ -186,7 +186,7 @@ def syncAssignments():
             calendar.batch_create_event(new)
         if changed is not None:
             calendar.batch_update_event(changed)
-    return jsonify({"status": "success"})
+    return jsonify({"status": "success"}) 
 
 @mainPage_bp.route("/dashboard/assignments/<int:assignment_id>/edit", methods=["POST"])
 def editAssignment(assignment_id):

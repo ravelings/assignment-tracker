@@ -43,7 +43,7 @@ class Assignment(db.Model):
         canvas_course_id=None,
         workflow_state=None,
         description=None,
-        status=None,
+        status=0,
         created=None,
         updated=None,
         points_possible=None,

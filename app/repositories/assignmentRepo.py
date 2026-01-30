@@ -1,9 +1,7 @@
-from datetime import datetime
-
+from datetime import date, datetime, timezone
 from extensions.extensions import db
 from models.assignment import Assignment
 from models.courses import Course
-from datetime import date
 from repositories.courseRepo import CourseRepo
 
 class AssignmentRepo:
@@ -141,6 +139,25 @@ class AssignmentRepo:
             .order_by(Assignment.assignment_id.asc())
             .all()
         )
+    
+    def get_active_not_in_calendar(self, user_id, course_id):
+        # returns assignment whose due date is in the future
+        
+        now_iso = datetime.now(timezone.utc)
+        assignments = Assignment.query.filter(
+                Assignment.user_id == user_id,
+                Assignment.course_id == course_id,
+                Assignment.status != 1,
+                Assignment.event_id.is_(None)
+            ).all()
+        # if no assignment found
+        if len(assignments) < 0: return None 
+        active = []
+        # finding active assignments
+        for assignment in assignments:
+            if datetime.fromisoformat(assignment.due) > now_iso: active.append(assignment)
+        # return if found
+        return active if len(active) > 0 else None
     
     def get_SortedByPoints_Assignment(self, user_id):
         # returns a list of all assignments sorted by points

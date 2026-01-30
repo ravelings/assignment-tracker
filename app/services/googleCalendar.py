@@ -76,11 +76,11 @@ class GoogleCalendar():
         token_uri = web_config.get("token_uri")
 
         cred = Credentials(token=self.token,
-                           refresh_token=self.refresh_token,
-                           token_uri=token_uri,
-                           client_id=client_id,
-                           client_secret=client_secret,
-                           scopes=self.scopes)
+                        refresh_token=self.refresh_token,
+                        token_uri=token_uri,
+                        client_id=client_id,
+                        client_secret=client_secret,
+                        scopes=self.scopes)
         try:
             cred.refresh(Request())
         except RefreshError as e:
@@ -177,7 +177,7 @@ class GoogleCalendar():
         due_date = assignment.due
         title = assignment.title
         desc = assignment.description
-        request_id = assignment.id
+        request_id = assignment.assignment_id
         course = assignment.course.course_name
 
         dt = datetime.datetime.fromisoformat(due_date)
@@ -213,8 +213,9 @@ class GoogleCalendar():
         # creates/updates event ID for assignment
         event_id = response['id']
         assignmentRepo = AssignmentRepo()
+        assignment_id = int(request_id) if isinstance(request_id, str) and request_id.isdigit() else request_id
         assignmentRepo.set_event_id(user_id=self.user_id, 
-                                    assignment_id=request_id, 
+                                    assignment_id=assignment_id, 
                                     event_id=event_id)
         return
 
@@ -228,7 +229,7 @@ class GoogleCalendar():
             for assignment in assignment_list:
                 event, request_id = self._create_assignment_body(assignment)
                 batch.add(service.events().insert(calendarId=calendar_id, body=event), 
-                        request_id=request_id,
+                        request_id=str(request_id),
                         callback=self._handle_batch)
             else:
                 batch.execute()
@@ -266,7 +267,7 @@ class GoogleCalendar():
     
                 event = self._create_update_body(assignment)
                 batch.add(service.events().get(calendarId=calendar_id, eventId=event_id, body=event), 
-                        request_id=assignment.assignment_id,
+                        request_id=str(assignment.assignment_id),
                         callback=self._handle_batch)
             else:
                 batch.execute()
@@ -288,4 +289,3 @@ class GoogleCalendar():
             else:
                 print("Unkown Error")
                 raise Exception("Unkown Error")
-

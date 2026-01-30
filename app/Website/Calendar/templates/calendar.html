@@ -11,6 +11,10 @@
         style="border-width:0" 
         width="800" 
         height="600" frameborder="0" scrolling="no"></iframe>
+    <form method="POST" action="{{url_for('calendar.sync')}}">
+        {{submitForm.hidden_tag()}}
+        {{submitForm.submit(class_="btn btn-primary", label="Sync")}}
+    </form>
 </div>
 
 
