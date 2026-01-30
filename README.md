@@ -5,12 +5,13 @@ Canvas assignments with Osmos; Google Calendar, allowing assignments to be creat
 ## How to Set up Locally
 Example DB is included inside /app/database/database.db
 
-### Install all dependencies:
+### 1. Install all dependencies:
 
-## Flask:
+#### Flask:
 pip install Flask Flask-SQLAlchemy Flask-Login WTForms 
 
-## Google Calendar API + OAuth:
+#### Google Calendar API + OAuth:
 pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
 
-### Run main.py
+### 2. Start Flask Dev Web Server
+Run main.py
