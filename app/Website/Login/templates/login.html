@@ -46,6 +46,7 @@
                     {{ form.submit.label.text }}>Login</button>
                 </div>
             </form>
+            <div id="login-alert" class="alert alert-danger d-none" role="alert"></div>
             <div class="create-account">
                 <p class="text2">Don't have an account?</p>
                 <a href="{{ url_for('login.register') }}" class="hyperlink">Create an Account</a>
@@ -79,7 +80,27 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
-
+    <script>
+        function showLoginAlert(msg) {
+            const alertBox = document.getElementById('login-alert');
+            if (!alertBox) {
+                return;
+            }
+            alertBox.innerHTML = msg;
+            alertBox.classList.add('show');
+            alertBox.classList.remove('d-none');
+        }
+    </script>
+{%with messages = get_flashed_messages(with_categories=true)%}
+    {%if messages%}
+        {% for category, msg in messages %}
+            {% if category == "error" %}
+                <script>
+                    showLoginAlert({{ msg| tojson }});
+                </script>
+            {%endif%}
+        {%endfor%}
+    {%endif%}
+{%endwith%}
 </body>
-
 </html>

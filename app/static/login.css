@@ -15,7 +15,7 @@ a:link, a:visited, a:hover, a:active {
 }
 
 .main-box {
-    height: 30rem;
+    height: 33rem;
     bottom: -10px;
     width: 25rem;
     max-width: 90vh;
@@ -79,9 +79,7 @@ a:link, a:visited, a:hover, a:active {
 
 .logo {
     width: 10rem;
-    height: 10rem;
-    transform: translateY(-120%);
-    position: absolute
+    height: 5rem;
 }
 
 .form-img {

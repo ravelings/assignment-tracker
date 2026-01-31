@@ -43,6 +43,15 @@ class UserRepo:
         else:
             return None
 
+    def getGoogleUser(self, iss, sub):
+        return (User.query.filter_by(iss=iss, sub=sub).one_or_none())
+
+    def createGoogleUser(self, iss, sub):
+        user = User(iss=iss, sub=sub)
+        db.session.add(user)
+        self.commit() 
+        return user
+
     def setCredentials(self, user_id, token, refresh_token, scopes, expiry):
         user = User.query.filter_by(user_id=user_id).first()
         user.google_token = token 

@@ -8,6 +8,9 @@ class User(UserMixin, db.Model):
     username = db.Column("username", db.String(50), nullable=False, unique=True)
     hash = db.Column("hash", db.String(255))
 
+    iss = db.Column("google_iss", db.String(255), nullable=True)
+    sub = db.Column("google_sub", db.String(255), nullable=True)
+    
     canvas_token = db.Column("canvas_token", db.String(255), nullable=True)
     total_completed = db.Column("total_completed", db.Integer, nullable=False)
     
@@ -17,9 +20,11 @@ class User(UserMixin, db.Model):
     expiry = db.Column("expiry", db.String(255), nullable=True)
     calendar_id = db.Column("calendar_id", db.String(255), nullable=True)
 
-    def __init__(self, username, hash):
-        self.username   = username
-        self.hash       = hash
+    def __init__(self, username=None, hash=None, iss=None, sub=None):
+        self.username = username
+        self.hash = hash
+        self.iss = iss
+        self.sub = sub
         self.total_completed = 0
 
     def get_id(self):

@@ -20,15 +20,15 @@ def settings():
     user_id = current_user.user_id
     settingsRepo = SettingsRepo()
     user_settings = settingsRepo.getUserSettings(user_id)
+    if not user_settings:
+        user_settings = settingsRepo.initSettings(user_id).getUserSettings(user_id)
+        
     userRepo = UserRepo()
     
     calender_id = userRepo.get_calendar_id(user_id)
     
     tokenForm = AddTokenForm()
-    setScoreModeForm = SetScoreMode(function=int(user_settings.scoring_strategy))
-
-    if not user_settings:
-        user_settings = settingsRepo.initSettings(user_id).getUserSettings(user_id)
+    setScoreModeForm = SetScoreMode(function=int(user_settings.function))
 
     return render_template("settings.html", 
                         settings=user_settings, 

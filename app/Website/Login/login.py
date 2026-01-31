@@ -26,7 +26,7 @@ def home():
 @login_bp.route("/login/", methods=["POST", "GET"]) # login page
 def login():
     form = LoginForm()
-    if form.validate_on_submit:
+    if form.validate_on_submit():
         username = form.username.data
         user = repo.getUserByName(username)
         
@@ -38,7 +38,7 @@ def login():
                 return redirect(url_for("login.home"))
             else:
 
-                flash("Password incorrect or user not found!", category="login_error")
+                flash("Password incorrect or user not found!", category="error")
                 return redirect(url_for("login.login"))
     
     return render_template("login.html", form=form)
@@ -70,6 +70,21 @@ def logout():
     logout_user()
     return redirect(url_for("login.login"))
 
+def _create_or_verify_google(idinfo: dict, client_id: str) -> bool:
+    print(f"ISS: {idinfo['iss']}")
+    print(f"Client ID: {idinfo['azp']} vs {client_id}")
+    if idinfo['iss'] != "https://accounts.google.com": return False
+    if client_id != idinfo['azp']: return False 
+    userRepo = UserRepo()
+    user = userRepo.getGoogleUser(iss=idinfo['iss'], sub=idinfo['sub'])
+    
+    if user is not None: return True 
+    # create
+    print(f"iss {idinfo['iss']}")
+    print(f"sub: {idinfo['sub']}")
+    user = userRepo.createGoogleUser(iss=idinfo['iss'], sub=idinfo['sub'])
+    return True if user else False
+
 @login_bp.route("login/auth/google/", methods=["POST"])
 def loginWithGoogle():
     app_dir = Path(__file__).resolve().parents[2]
@@ -77,8 +92,9 @@ def loginWithGoogle():
 
     with secret_path.open("r", encoding="utf-8") as handle:
         secret_data = json.load(handle)
+        client_config = secret_data.get("web", {})
     token_handler = request.form 
-    client_id = secret_data.get("client_id")
+    client_id = client_config.get("client_id")
     cred = token_handler["credential"]
     cookie = (request.cookies)["g_csrf_token"]
     token = token_handler["g_csrf_token"]
@@ -93,9 +109,16 @@ def loginWithGoogle():
         idinfo = id_token.verify_oauth2_token(cred, requests.Request(), client_id)
 
         print(f"ID Info: {idinfo}")
-        google_id = idinfo['sub']
+        creation = _create_or_verify_google(idinfo, client_id)
+        print(f"Creation status: {creation}")
+        if creation is True:
+            userRepo = UserRepo()
+            user = userRepo.getGoogleUser(iss=idinfo['iss'], sub=idinfo['sub'])
+            login_user(user=user)
+            return redirect(url_for("mainPage.dashboard"))
+        else:
+            flash("Error logging in with Google!", "error")
+            return redirect(url_for("login.login"))
 
     except ValueError:
         raise "Invalid Token"
-    
-    return redirect(url_for("settings.settings"))
