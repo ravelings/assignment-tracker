@@ -111,12 +111,12 @@ def dashboard():
     completed = userRepo.getComplete(user_id)
 
     return render_template("dashboard.html", 
-                           completed=completed,
-                           assignments=assignments, 
-                           deleteForm=deleteForm, 
-                           assignmentForm=assignmentForm,
-                           editForm=editAssignmentForm,
-                           checkForm=checkForm)
+                        completed=completed,
+                        assignments=assignments, 
+                        deleteForm=deleteForm, 
+                        assignmentForm=assignmentForm,
+                        editForm=editAssignmentForm,
+                        checkForm=checkForm)
 
 @mainPage_bp.route("/userinfo/")
 @login_required

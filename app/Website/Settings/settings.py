@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request, abort
 from datetime import timezone, datetime
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, logout_user
 from repositories.settingsRepo import SettingsRepo
 from repositories.userRepo import UserRepo
 from forms.setScoreMode import SetScoreMode
@@ -18,19 +18,23 @@ settings_bp = Blueprint("settings", __name__, template_folder="templates")
 @login_required
 def settings():
     user_id = current_user.user_id
-    repo = SettingsRepo()
-    user_settings = repo.getUserSettings(user_id)
+    settingsRepo = SettingsRepo()
+    user_settings = settingsRepo.getUserSettings(user_id)
+    userRepo = UserRepo()
+    
+    calender_id = userRepo.get_calendar_id(user_id)
     
     tokenForm = AddTokenForm()
     setScoreModeForm = SetScoreMode(function=int(user_settings.scoring_strategy))
 
     if not user_settings:
-        user_settings = repo.initSettings(user_id).getUserSettings(user_id)
+        user_settings = settingsRepo.initSettings(user_id).getUserSettings(user_id)
 
     return render_template("settings.html", 
-                           settings=user_settings, 
-                           scoreForm=setScoreModeForm,
-                           tokenForm=tokenForm)
+                        settings=user_settings, 
+                        scoreForm=setScoreModeForm,
+                        tokenForm=tokenForm,
+                        calendarId=calender_id)
 
 @settings_bp.route("/dashboard/settings/function", methods=["POST"])
 @login_required
@@ -71,7 +75,6 @@ def setToken():
         
     print(form.errors)
     return redirect(url_for("settings.settings"))
-
 
 def _store_token(auth_code):
     app_dir = Path(__file__).resolve().parents[2]
@@ -122,6 +125,7 @@ def _store_token(auth_code):
     print(f"Expiry: {expiry}")
     print("Access token:", credentials.token)
     print("Refresh token:", credentials.refresh_token)
+    print(f"Account: {credentials.account}")
 
     userRepo = UserRepo()
     user_id = current_user.user_id
@@ -131,6 +135,8 @@ def _store_token(auth_code):
                             scopes=credentials.granted_scopes,
                             expiry=expiry)
     return
+
+#def _store_user_info()
 
 @settings_bp.route("/dashboard/settings/auth/google", methods=["POST", "GET"])
 @login_required
@@ -164,3 +170,9 @@ def calendarTest():
     calendar.create_assignment_event(due_date="2026-02-23T14:00:00Z")
 
     return redirect(url_for("settings.settings"))
+
+@settings_bp.route("/dashboard/settings/logout", methods=["POST"])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login.login'))

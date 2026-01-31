@@ -76,8 +76,17 @@
         </div>
         <h1 class="heading1 mb-1 mt-1">Integrations</h1>
         <div class="row" id="integrations">
-            <div>
-                <button onclick="client.requestCode();">Authorize with Google</button>
+            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+            {% if calendarId is not none %}
+                <span class="pr-1 w-auto">Google Calendar</span>
+                <button class="btn btn-secondary" onclick="client.requestCode();">
+                Reauthorize with Google</button>
+                <span class="success pr-1 w-auto">Signed in</span>
+            {% else %}
+                <span class="pr-1 w-auto">Google Calendar</span>
+                <button class="btn btn-secondary" onclick="client.requestCode();">
+                Authorize with Google</button>
+            {% endif %}
             </div>
 
             <form method="POST" action="{{ url_for('settings.authGoogle', _external=True, _scheme='http') }}">
@@ -92,11 +101,13 @@
                 </div>
             </form>
         </div>
-        <div class="row mt-2" id="logout">
-            <button class="btn btn-primary w-auto">
-                <img src="{{ url_for('static', filename='images/icons/logout.svg') }}">
-                Logout from Account
-            </button>
+        <div class="row mt-5" id="logout">
+            <form method="POST" action="{{ url_for('settings.logout') }}">
+                <button type="submit" class="btn btn-primary w-auto">
+                    <img class="icon" src="{{ url_for('static', filename='images/icons/logout.svg') }}">
+                    Logout from Account
+                </button>
+            </form>
         </div>
     </div>
 
@@ -150,5 +161,3 @@
     {%endif%}
 {%endwith%}
 {% endblock %}
-
-

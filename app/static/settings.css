@@ -5,6 +5,8 @@
     --bg-dark: oklch(0.92 0.01 255);
     --bg: oklch(0.96 0.01 255);
     --bg-light: oklch(1 0.01 255);
+
+    --success: oklch(80.467% 0.22855 148.755);
 }
 
 .text2{
@@ -19,4 +21,13 @@
 .btn-submit {
   width: 2rem;
   height: 2rem;
+}
+
+.success {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.icon {
+  filter: invert(75%);
 }

@@ -1,9 +1,16 @@
+from pathlib import Path
+import json
+
 from flask import render_template, request, redirect, url_for, flash, Blueprint, session
 from flask_login import login_user, logout_user
 from repositories.userRepo import UserRepo
 from services.auth_service import verify_password
 from forms.LoginRegister import LoginForm, RegisterForm
 from extensions.extensions import loginManager
+
+from google.oauth2 import id_token
+from google.auth.transport import requests
+
 
 login_bp = Blueprint("login", __name__, static_folder="static", template_folder="templates")
 repo = UserRepo()
@@ -63,8 +70,15 @@ def logout():
     logout_user()
     return redirect(url_for("login.login"))
 
+@login_bp.route("login/auth/google/", methods=["POST"])
 def loginWithGoogle():
+    app_dir = Path(__file__).resolve().parents[2]
+    secret_path = app_dir / "Database" / "client_secret.json"
+
+    with secret_path.open("r", encoding="utf-8") as handle:
+        secret_data = json.load(handle)
     token_handler = request.form 
+    client_id = secret_data.get("client_id")
     cred = token_handler["credential"]
     cookie = (request.cookies)["g_csrf_token"]
     token = token_handler["g_csrf_token"]
