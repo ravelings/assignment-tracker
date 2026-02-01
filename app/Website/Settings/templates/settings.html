@@ -129,7 +129,7 @@
             {% endif %}
             </div>
 
-            <form method="POST" action="{{ url_for('settings.authGoogle', _external=True, _scheme='http') }}">
+            <form method="POST" action="{{ url_for('settings.setToken', _external=True, _scheme='http') }}">
                 {{tokenForm.csrf_token(id='tokenForm_csrf_token')}}
                 <div class="row w-auto align-items-center">
                     <span class="pr-1 w-auto">Canvas Token</span>
