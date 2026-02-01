@@ -66,7 +66,7 @@ class GoogleCalendar():
         
     def _refresh_token(self):
         app_dir = Path(__file__).resolve().parents[1]
-        secret_path = app_dir / "Database" / "client_secret.json"
+        secret_path = app_dir / "client_secret.json"
 
         with secret_path.open("r", encoding="utf-8") as handle:
             secret_data = json.load(handle)

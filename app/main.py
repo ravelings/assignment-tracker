@@ -42,7 +42,9 @@ app.register_blueprint(scores_bp, url_prefix="/dashboard/")
 ## settings
 app.register_blueprint(settings_bp, url_prefix="")
 # secret
-app.secret_key = "12345"
+app.secret_key = os.getenv("secret")
 
+""" FOR DEV ONLY
 if __name__ == "__main__":
     app.run(debug=True)
+"""
