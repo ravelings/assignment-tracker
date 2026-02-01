@@ -1,5 +1,8 @@
+import json
 from flask import Flask
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 from extensions.extensions import db, loginManager
 from Website.Login.login import login_bp
 from Website.MainPage.mainPage import mainPage_bp
@@ -9,11 +12,16 @@ from Website.Scores.scoreManager import scores_bp
 from Website.Settings.settings import settings_bp
 from Website.Calendar.calendar import calendar_bp
 
+load_dotenv()
+
 app = Flask(__name__)
 # DB config
-basedir = Path(__file__).resolve().parent
-db_path = basedir / "Database" / "database.db"
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+
+# app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+
+app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 db.init_app(app)
 # Login Manager
 loginManager.init_app(app)

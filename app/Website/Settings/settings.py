@@ -17,6 +17,8 @@ settings_bp = Blueprint("settings", __name__, template_folder="templates")
 @settings_bp.route("/dashboard/settings/", methods=["GET", "POST"])
 @login_required
 def settings():
+    userRepo = UserRepo()
+    user = userRepo.getUserById(user_id=current_user.user_id)
     user_id = current_user.user_id
     settingsRepo = SettingsRepo()
     user_settings = settingsRepo.getUserSettings(user_id)
@@ -30,7 +32,8 @@ def settings():
     tokenForm = AddTokenForm()
     setScoreModeForm = SetScoreMode(function=int(user_settings.function))
 
-    return render_template("settings.html", 
+    return render_template("settings.html",
+                        user = user, 
                         settings=user_settings, 
                         scoreForm=setScoreModeForm,
                         tokenForm=tokenForm,

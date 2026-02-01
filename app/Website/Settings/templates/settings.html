@@ -9,9 +9,6 @@
 {% block content %}
 
 <div class="container">
-    <button class="btn btn-primary" id="successToastBtn" onclick="createToast('Success', 'toast-success')">Show Success Toast</button>
-    <button class="btn btn-primary" id="successToastBtn" onclick="createToast('Fail', 'toast-fail')">Show Fail Toast</button>
-    <button class="btn btn-primary" href="{{ url_for('settings.calendarTest') }}">Calendar Test</button>
     <div class="toast-container position-fixed top-0 end-0 p-3">
     <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
         <div class="toast-header">
@@ -26,16 +23,59 @@
     </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalScrollableTitle">How to get Canvas Token</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <span>1. Head over to your Canvas Dashboard, select profile</span>
+            <img src="{{url_for('static', filename='images/canvas/1.svg')}}">
+            <span>2. Select Settings</span>
+            <img src="{{url_for('static', filename='images/canvas/2.svg')}}">
+            <span>3. Scroll down from Settings</span>
+            <img src="{{url_for('static', filename='images/canvas/3.svg')}}">
+            <span>4. Click "Create New Access Token"</span>
+            <img src="{{url_for('static', filename='images/canvas/4.svg')}}">
+            <span>5. Fill out info, including expiration time. Once token expires, 
+            you need to resubmit to Osmos Tracker. Once finished, select <strong>"Generate Token"</strong></span>
+            <img src="{{url_for('static', filename='images/canvas/5.svg')}}">
+            <span>6. Copy the token and submit it inside Osmos Tracker</span>
+            <img src="{{url_for('static', filename='images/canvas/6.svg')}}">
+            <div>
+            <strong>WARNING!</strong> Do not share your token with anyone! Once you close the tab 
+            you cannot view your token again!</div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+        </div>
+    </div>
+    </div>
+
     <div class="col">
         <div class="row" id="accountInfo">
             <h1 class="heading1">Account</h1>
-            <div class="col" id="username">
-                <p class="heading2">Username</p>
-                <p class="text2">John Doe</p>
-            </div>
             <div class="col" id="userId">
+                <p class="heading2">Username</p>
+                <p class="text2">{{user.username}}</p>
+            </div>
+            <div class="col" id="google">
                 <p class="heading2">User ID</p>
-                <p class="text2">12345</p>
+                <p class="text2">{{user.user_id}}</p>
+            </div>
+            <div class="col" id="google">
+                <p class="heading2">Google Account?</p>
+                <p class="text2">
+                {% if user.google_sub%}
+                    Yes
+                {% else %}
+                    No 
+                {%endif%}
+                </p>
             </div>
         </div>
         <h1 class="heading1">Settings</h1>
@@ -93,6 +133,9 @@
                 {{tokenForm.csrf_token(id='tokenForm_csrf_token')}}
                 <div class="row w-auto align-items-center">
                     <span class="pr-1 w-auto">Canvas Token</span>
+                        <button type="button" class="btn w-auto" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable">
+                            <img src="{{ url_for('static', filename='images/icons/info.svg') }}">
+                        </button>
                     {{tokenForm.token(class_="input w-25")}} 
                     {{tokenForm.submit(class_="d-none", id="submit2")}}
                     <button type="submit" class="btn btn-submit d-flex justify-content-center">
@@ -110,7 +153,6 @@
             </form>
         </div>
     </div>
-
 </div>
 {% endblock %}
 

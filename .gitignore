@@ -1,3 +1,4 @@
 token.txt
 apiTest.py
 app/Database/database.db
+.env

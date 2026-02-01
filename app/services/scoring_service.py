@@ -12,7 +12,7 @@ class ScoringService:
     def _get_strategy(self):
         settings = Settings.query.filter_by(user_id=self.user_id).first()
         if settings:
-            if settings.scoring_strategy == 0:
+            if settings.function == 0:
                 return "logistic"
             else:
                 return "exponential"

@@ -22,6 +22,12 @@
     border-radius: 1rem;
 }
 
+.modal-body img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
 .input {
     border: 0.15rem solid var(--bg-dark);
     border-radius: 0.5rem;

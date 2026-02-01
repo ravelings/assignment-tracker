@@ -6,6 +6,7 @@ from flask_login import login_user, logout_user
 from repositories.userRepo import UserRepo
 from services.auth_service import verify_password
 from forms.LoginRegister import LoginForm, RegisterForm
+from forms.UsernameForm import UsernameForm
 from extensions.extensions import loginManager
 
 from google.oauth2 import id_token
@@ -21,7 +22,7 @@ def load_user(user_id):
 
 @login_bp.route("/")
 def home():
-    return render_template("home.html") # home page
+    return redirect(url_for("login.login"))
 
 @login_bp.route("/login/", methods=["POST", "GET"]) # login page
 def login():
@@ -35,7 +36,7 @@ def login():
             verify = verify_password(hashed_password=user.hash, password=password)
             if verify:
                 login_user(user)
-                return redirect(url_for("login.home"))
+                return redirect(url_for("mainPage.dashboard"))
             else:
 
                 flash("Password incorrect or user not found!", category="error")
@@ -53,37 +54,37 @@ def register():
         password2 = form.password2.data
 
         if password == password2:
+            print("Creating account")
             user = repo.createUser(username=username, password=password)
             
             if user is not None:
+                print("User created")
                 return redirect(url_for("login.home"))
             else:
+                print("User not created")
                 return redirect(url_for("login.register"))
         else:
+            print("Password mismatch!")
             flash("Passwords does not match!", category="password_mismatch")
             return redirect(url_for("login.register"))
     else:
-        return render_template("register.html")
+        return render_template("register.html", form=form)
     
 @login_bp.route("/logout/")
 def logout():
     logout_user()
     return redirect(url_for("login.login"))
 
-def _create_or_verify_google(idinfo: dict, client_id: str) -> bool:
-    print(f"ISS: {idinfo['iss']}")
-    print(f"Client ID: {idinfo['azp']} vs {client_id}")
-    if idinfo['iss'] != "https://accounts.google.com": return False
-    if client_id != idinfo['azp']: return False 
+def _create_google(username, sub, iss):
+    userRepo = UserRepo()
+    user = userRepo.createGoogleUser(username=username, iss=iss, sub=sub)
+    return user if user else None
+
+def _verify_google(idinfo: dict) -> bool:
     userRepo = UserRepo()
     user = userRepo.getGoogleUser(iss=idinfo['iss'], sub=idinfo['sub'])
-    
-    if user is not None: return True 
-    # create
-    print(f"iss {idinfo['iss']}")
-    print(f"sub: {idinfo['sub']}")
-    user = userRepo.createGoogleUser(iss=idinfo['iss'], sub=idinfo['sub'])
-    return True if user else False
+    return True if user is not None else False
+
 
 @login_bp.route("login/auth/google/", methods=["POST"])
 def loginWithGoogle():
@@ -109,16 +110,48 @@ def loginWithGoogle():
         idinfo = id_token.verify_oauth2_token(cred, requests.Request(), client_id)
 
         print(f"ID Info: {idinfo}")
-        creation = _create_or_verify_google(idinfo, client_id)
-        print(f"Creation status: {creation}")
-        if creation is True:
+        ## Checks to make sure the ID info is valid
+        if idinfo['iss'] != "https://accounts.google.com":
+            flash("Error logging in with google! Invalid issuer", category="error")
+            return redirect(url_for('login.login'))
+        if client_id != idinfo['azp']:
+            flash("Error logging in with google! Invalid Client ID", category="error")
+            return redirect(url_for('login.login'))
+        ## DB check to see if user exists
+        verify = _verify_google(idinfo)
+        print(f"Verify status: {verify}")
+        if verify is True:
             userRepo = UserRepo()
             user = userRepo.getGoogleUser(iss=idinfo['iss'], sub=idinfo['sub'])
             login_user(user=user)
             return redirect(url_for("mainPage.dashboard"))
-        else:
-            flash("Error logging in with Google!", "error")
-            return redirect(url_for("login.login"))
+        if verify is False:
+            session['pending_google'] = {
+                'iss': idinfo['iss'],
+                'sub': idinfo['sub']
+            }
+            return redirect(url_for("login.createGoogleUsername"))
 
     except ValueError:
         raise "Invalid Token"
+
+@login_bp.route("login/username/", methods=["GET", "POST"])
+def createGoogleUsername():
+    pending = session.get('pending_google')
+    if pending is None:
+        flash("Google sign-in session failed", category="error")
+        return redirect(url_for('login.login'))
+
+    iss = pending['iss']
+    sub = pending['sub']
+    usernameForm = UsernameForm()
+    if usernameForm.validate_on_submit():
+        username = usernameForm.data.username 
+        user = _create_google(username=username, sub=sub, iss=iss)
+        if user: 
+            session.pop('pending_google', None)
+            login_user(user)
+            return redirect(url_for('mainPage.dashboard'))
+        else: 
+            flash("Error in creating Username", category="error")
+    return render_template('username.html', form=usernameForm)
