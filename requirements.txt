@@ -1,0 +1,18 @@
+## python
+python-dotenv
+## password
+argon2-cffi
+## flask
+Flask
+Flask-Login
+Flask-SQLAlchemy
+psycopg2-binary
+Flask-WTF
+WTForms
+## google OAUTH
+google-api-python-client
+google-auth
+google-auth-httplib2
+google-auth-oauthlib
+oauthlib
+requests
