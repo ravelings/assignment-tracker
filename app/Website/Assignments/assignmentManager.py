@@ -24,7 +24,7 @@ def createAssignment():
         course_id = form.course_id.data 
         title = form.title.data 
         description = form.description.data 
-        due = datetime.fromisoformat(form.due.data)
+        due = datetime.fromisoformat(str(form.due.data)) 
         points = form.points.data 
         effort = form.effort.data
         status = form.status.data

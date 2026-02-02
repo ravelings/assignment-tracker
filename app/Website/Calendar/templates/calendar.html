@@ -8,9 +8,11 @@
 {%  endblock %}
 
 <div class="col">
-    <p> Google Calendar view has not been implemented yet! </p>
+    <h2> Google Calendar view has not been implemented yet! </h2>
+    <p>Please authorize with Google inside <a href="{{ url_for('settings.settings')}}">settings</a>
+        before syncing.</p>
     <div class="row m-2">
-        <form class="w-auto align-self-end ms-auto" method="POST" action="{{url_for('calendar.sync')}}">
+        <form class="w-auto align-self-start" method="POST" action="{{url_for('calendar.sync')}}">
             {{submitForm.hidden_tag()}}
             <button type="submit" class="btn btn-primary" id="sync">
                 <img class="btn-icon" src="{{ url_for('static', filename='images/icons/sync1.svg') }}">

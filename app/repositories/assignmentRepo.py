@@ -12,7 +12,7 @@ class AssignmentRepo:
         db.session.commit()
 
     def createAssignment(self, user_id, course_id, title, desc=None, due=None, points=None, effort=1, status=0):
-        created = date.today().isoformat()
+        created = datetime.now(timezone.utc)
 
         assignment = Assignment(
             user_id=user_id,
