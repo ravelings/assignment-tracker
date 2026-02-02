@@ -15,7 +15,10 @@ from Website.Calendar.calendar import calendar_bp
 app = Flask(__name__)
 # DB config
 # SQLite file paths on Windows need three slashes after sqlite:
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///C:/Users/ravel/Documents/Coding/Assignment Tracker (Antigravity)/assignment-tracker/app/Database/database.db"
+app_dir = Path(__file__).resolve().parent
+db_path = app_dir / "Database" / "database.db"
+print(f"Dir: {db_path}")
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 #app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
 #app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
