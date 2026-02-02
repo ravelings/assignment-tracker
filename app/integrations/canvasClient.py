@@ -120,7 +120,13 @@ class CanvasClient:
             due_date = datetime.fromisoformat(assignment['due_at'])
             created = datetime.fromisoformat(assignment['created_at'])
             updated = datetime.fromisoformat(assignment['updated_at'])
-            unlock = datetime.fromisoformat(assignment['unlock_at'])
+            raw_unlock = assignment.get("unlock_at")
+
+            if raw_unlock:
+                unlock = datetime.fromisoformat(raw_unlock)
+            else:
+                unlock = None
+                
             to_append = Assignment(
                 user_id=user_id,
                 course_id=course_id,
