@@ -31,9 +31,10 @@ class CanvasClient:
         request_url = self.base_url + "courses"
         request = request_url+"?access_token="+self.token
 
-        courses = requests.get(request).json()
-        logging.error("Canvas status=%s content-type=%s", courses.status_code, courses.headers.get("Content-Type"))
-        logging.error("Canvas body head=%r", courses.text[:200])
+        resp = requests.get(request)
+        logging.error("Canvas status=%s content-type=%s", resp.status_code, resp.headers.get("Content-Type"))
+        logging.error("Canvas body head=%r", resp.text[:200])
+        courses = resp.json()
         print("Course Obtained")
         today = date.today().isoformat()
         if [next(iter(courses))] == "errors":
