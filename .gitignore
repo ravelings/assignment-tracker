@@ -1,5 +1,5 @@
 token.txt
 apiTest.py
-app/Database/database.db
+app/Database/database_local.db
 .env
 client_secret.json
