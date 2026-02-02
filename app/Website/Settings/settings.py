@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request, abort
-from datetime import timezone, datetime
+from datetime import timezone
 from flask_login import login_required, current_user, logout_user
 from repositories.settingsRepo import SettingsRepo
 from repositories.userRepo import UserRepo
