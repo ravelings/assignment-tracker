@@ -180,7 +180,7 @@
     ux_mode: 'popup',
     callback: (response) => {
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', "{{url_for('settings.authGoogle', external=True)}}", true);
+        xhr.open('POST', "{{url_for('settings.authGoogle', _external=True)}}", true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         // Set custom header for CRSF
         xhr.setRequestHeader('X-Requested-With', 'XmlHttpRequest');
