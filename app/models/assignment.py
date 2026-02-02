@@ -1,4 +1,5 @@
 from extensions.extensions import db
+from sqlalchemy import DateTime
 
 class Assignment(db.Model):
     __tablename__ = "assignments"
@@ -13,22 +14,22 @@ class Assignment(db.Model):
 
     description = db.Column("description", db.Text, nullable=True)
 
-    due = db.Column("due", db.Text, nullable=False)        # ISO-8601 text datetime recommended
+    due = db.Column("due", DateTime(timezone=True), nullable=False)        # ISO-8601 text datetime recommended
     status = db.Column("status", db.Integer, nullable=True)  # 0/1 or enum-like int
 
-    created = db.Column("created", db.Text, nullable=True)
-    updated = db.Column("updated", db.Text, nullable=True)
+    created = db.Column("created", DateTime(timezone=True), nullable=True)
+    updated = db.Column("updated", DateTime(timezone=True), nullable=True)
 
     points_possible = db.Column("points_possible", db.Integer, nullable=True)
     score = db.Column("score", db.Float, nullable=True)  # Actual score achieved
     canvas_assignment_id = db.Column("canvas_assignment_id", db.Integer, nullable=True)
     
     workflow_state = db.Column("workflow_state", db.Text, nullable=True)
-    unlock_at = db.Column("unlock_at", db.Text, nullable=True)
+    unlock_at = db.Column("unlock_at", DateTime(timezone=True), nullable=True)
     html_url = db.Column("html_url", db.Text, nullable=True)
     submission_type = db.Column("submission_type", db.Text, nullable=True)
     canvas_base_url = db.Column("canvas_base_url", db.Text, nullable=True)
-    last_canvas_sync = db.Column("last_canvas_sync", db.Text, nullable=True)
+    last_canvas_sync = db.Column("last_canvas_sync", DateTime(timezone=True), nullable=True)
     effort = db.Column("effort", db.Integer, nullable=True, default=1) # 1=Low, 2=Med, 3=High
 
     event_id = db.Column("event_id", db.Text, nullable=True)
