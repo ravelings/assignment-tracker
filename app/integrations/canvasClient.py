@@ -117,20 +117,24 @@ class CanvasClient:
                 continue
 
             print(f"Assignment Course ID: {course_id}" )
+            due_date = datetime.fromisoformat(assignment['due_at'])
+            created = datetime.fromisoformat(assignment['created_at'])
+            updated = datetime.fromisoformat(assignment['updated_at'])
+            unlock = datetime.fromisoformat(assignment['unlock_at'])
             to_append = Assignment(
                 user_id=user_id,
                 course_id=course_id,
                 title=assignment['name'],
-                due=assignment['due_at'], # date 
+                due=due_date, # date 
                 canvas_assignment_id=assignment['id'],
                 canvas_course_id=int(canvas_course_id),
                 workflow_state=assignment['workflow_state'],
                 description=assignment['description'],
                 status=None,
-                created=assignment['created_at'],
-                updated=assignment['updated_at'],
+                created=created,
+                updated=updated,
                 points_possible=assignment['points_possible'],
-                unlock_at=assignment['unlock_at'],
+                unlock_at=unlock,
                 html_url=assignment['html_url'],
                 submission_type=json.dumps(assignment.get('submission_types')),
                 canvas_base_url=self.base_url,

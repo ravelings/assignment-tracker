@@ -5,6 +5,7 @@ from forms.addTokenForm import AddTokenForm
 from repositories.assignmentRepo import AssignmentRepo
 from repositories.userRepo import UserRepo
 from repositories.courseRepo import CourseRepo
+from datetime import datetime
 
 assignments_bp = Blueprint("assignments", __name__, static_folder="static", template_folder="templates")
 
@@ -23,7 +24,7 @@ def createAssignment():
         course_id = form.course_id.data 
         title = form.title.data 
         description = form.description.data 
-        due = form.due.data 
+        due = datetime.fromisoformat(form.due.data)
         points = form.points.data 
         effort = form.effort.data
         status = form.status.data

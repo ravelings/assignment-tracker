@@ -84,7 +84,7 @@ class AssignmentRepo:
             # if new assignments are created
             if len(new_assignments) > 0:
                 db.session.add_all(new_assignments)
-                print("Addubg new assignments...")
+                print("Adding new assignments...")
             # if new assignment created or assignments changed, commit
             if len(new_assignments) > 0 or len(changed_assignments) > 0:
                 print("Committing...")
