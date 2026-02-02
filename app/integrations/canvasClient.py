@@ -1,4 +1,5 @@
 import json
+import logging
 import requests 
 from models.assignment import Assignment
 from models.courses import Course
@@ -21,13 +22,18 @@ class CanvasClient:
             request_url = self.base_url + f"{type}" + "/" + f"{id}"
             
         request = request_url+"?access_token="+self.token 
-        return requests.get(request)
+        resp = requests.get(request)
+        logging.error("Canvas status=%s content-type=%s", resp.status_code, resp.headers.get("Content-Type"))
+        logging.error("Canvas body head=%r", resp.text[:200])
+        return resp
 
     def getCourses(self):
         request_url = self.base_url + "courses"
         request = request_url+"?access_token="+self.token
 
         courses = requests.get(request).json()
+        logging.error("Canvas status=%s content-type=%s", courses.status_code, courses.headers.get("Content-Type"))
+        logging.error("Canvas body head=%r", courses.text[:200])
         print("Course Obtained")
         today = date.today().isoformat()
         if [next(iter(courses))] == "errors":
