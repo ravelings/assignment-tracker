@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request, abort
+from urllib.parse import urlsplit
 from datetime import timezone
 from flask_login import login_required, current_user, logout_user
 from repositories.settingsRepo import SettingsRepo
@@ -89,7 +90,8 @@ def _store_token(auth_code):
                 "openid", 
                 "https://www.googleapis.com/auth/calendar.readonly", 
                 "https://www.googleapis.com/auth/calendar"])
-    flow.redirect_uri = "http://localhost:5000"
+    origin = f"{request.scheme}://{request.host}"
+    flow.redirect_uri = origin
     print(f"Redirect URI: {flow.redirect_uri}")
     print("Fetching token...")
 
