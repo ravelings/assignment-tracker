@@ -27,6 +27,13 @@
     <div class="modal fade" id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable" role="document">
         <div class="modal-content">
+
+        </div>
+    </div>
+    </div>
+
+    <template id="tmpl-token">
+        <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title" id="exampleModalScrollableTitle">How to get Canvas Token</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -53,8 +60,24 @@
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
         </div>
         </div>
+    </template>
+
+    <template id="tmpl-instance">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalScrollableTitle">How to get Canvas Instance</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <span>1. Head over to your Canvas dashboard and copy its URL</span>
+            <img class="img-canva" src="{{url_for('static', filename='images/canvas/canvas_instance.svg')}}">
+            <strong>NOTE:</strong> Your Canvas URL must match the account where you created your token!</div>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
     </div>
-    </div>
+    </template>
 
     <div class="col">
         <div class="row" id="accountInfo">
@@ -129,11 +152,11 @@
             {% endif %}
             </div>
 
-            <form method="POST" action="{{ url_for('settings.setToken', _external=True, _scheme='http') }}">
+            <form method="POST" action="{{ url_for('settings.setToken') }}">
                 {{tokenForm.csrf_token(id='tokenForm_csrf_token')}}
                 <div class="row w-auto align-items-center">
                     <span class="pr-1 w-auto">Canvas Token</span>
-                        <button type="button" class="btn w-auto" data-bs-toggle="modal" data-bs-target="#exampleModalScrollable">
+                        <button type="button" class="btn w-auto" onclick="showTokenModal()">
                             <img src="{{ url_for('static', filename='images/icons/info.svg') }}">
                         </button>
                     {{tokenForm.token(class_="input w-25")}} 
@@ -143,6 +166,25 @@
                     </button>
                 </div>
             </form>
+        
+            <form method="POST" action="{{ url_for('settings.setInstance') }}">
+                {{instanceForm.csrf_token(id='instanceForm_csrf_token')}}
+                <div class="row w-auto align-items-center">
+                    <span class="required-span d-inline-flex flex-column pr-1 w-auto">
+                        <span>Canvas Instance</span>
+                        <small class="text-danger">Required</small>
+                    </span>
+                        <button type="button" class="btn w-auto" onclick="showInstanceModal()">
+                            <img src="{{ url_for('static', filename='images/icons/info.svg') }}">
+                        </button>
+                    {{tokenForm.token(class_="input w-25")}} 
+                    {{tokenForm.submit(class_="d-none", id="submit2")}}
+                    <button type="submit" class="btn btn-submit d-flex justify-content-center">
+                        <img class="" src="{{ url_for('static', filename='images/icons/check1.svg')}}">
+                    </button>
+                </div>
+            </form>
+
         </div>
         <div class="row mt-5" id="logout">
             <form method="POST" action="{{ url_for('settings.logout') }}">
@@ -159,6 +201,27 @@
 {% block scripts %}
 <script src="https://accounts.google.com/gsi/client"></script>
 <script>
+    const modal = document.getElementById("exampleModalScrollable");
+    const dialog = modal.querySelector(".modal-dialog");
+
+    modal.addEventListener("hidden.bs.modal", () => {
+    dialog.replaceChildren();
+    });
+
+    function showTokenModal() {
+        dialog.replaceChildren(
+            document.getElementById("tmpl-token").content.cloneNode(true)
+        );
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
+
+    function showInstanceModal() {
+        dialog.replaceChildren(
+            document.getElementById("tmpl-instance").content.cloneNode(true)
+        );
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
+
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 

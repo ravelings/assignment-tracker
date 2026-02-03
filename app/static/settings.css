@@ -31,3 +31,7 @@
 .icon {
   filter: invert(75%);
 }
+
+.required-span {
+  transform: translateY(20%);
+}

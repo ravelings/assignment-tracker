@@ -157,14 +157,14 @@ def syncAssignments():
     userRepo = UserRepo()
     user_id = current_user.user_id
     user = userRepo.getUserById(user_id)
-
+    instance = userRepo.getCanvasInstance(user_id)
     token = userRepo.getCanvasToken(user_id)
 
     if token is None:
         flash("Error: Token not set or expired, please set up token in settings before syncing.", category="token")
         return jsonify({"status": "failed"})
     
-    client = CanvasClient(user_id=user_id, token=token, instance="onu")
+    client = CanvasClient(user_id=user_id, token=token, instance=instance)
     canvasCourses = client.getCourses()
 
     if canvasCourses is None:
@@ -225,17 +225,3 @@ def completeAssignment(assignment_id):
     else:
         print(form.errors)
     return redirect(url_for("mainPage.dashboard"))
-                
-
-@mainPage_bp.route("/test", methods=["GET"])
-def test():
-    repo = UserRepo()
-    client = CanvasClient(user_id=1,token=repo.getCanvasToken(user_id=1), instance="onu")
-
-    course = client.getCourseById(course_id=12637)
-    if course: 
-        print(f"The Assignment is: {client.getAssignmentsByCourse(1, course)}")
-    else:
-        print("Course empty")
-    
-    return render_template("temp.html")

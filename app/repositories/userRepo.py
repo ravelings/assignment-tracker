@@ -91,6 +91,15 @@ class UserRepo:
         
         return token
     
+    def setCanvasInstance(self, user_id, instance):
+        user = User.query.filter_by(user_id=user_id).first()
+        user.canvas_instance = instance 
+        self.commit()
+        return
+    
+    def getCanvasInstance(self, user_id):
+        return (User.query.filter_by(user_id=user_id).first()).canvas_instance
+    
     def getComplete(self, user_id):
         return User.query.filter_by(user_id=user_id).first().total_completed
     

@@ -64,12 +64,13 @@ def syncCourse():
     courseRepo = CourseRepo()
     user_id = current_user.user_id
     token = userRepo.getCanvasToken(user_id)
+    instance = userRepo.getCanvasInstance(user_id)
     if token is None:
         print("Token not set up")
         flash("Error: Token not set, please set up token before syncing.", category="fail")
         return jsonify({"status": "failed"})
     
-    client = CanvasClient(user_id=user_id, token=token, instance="canvas")
+    client = CanvasClient(user_id=user_id, token=token, instance=instance)
     canvasCourses =  client.getCourses()
     if canvasCourses is None:
         print("Canvas course is none")

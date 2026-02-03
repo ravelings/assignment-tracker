@@ -19,6 +19,8 @@ class User(UserMixin, db.Model):
     granted_scopes = db.Column("granted_scopes", db.String(255), nullable=True)
     expiry = db.Column("expiry", db.String(255), nullable=True)
     calendar_id = db.Column("calendar_id", db.String(255), nullable=True)
+    
+    canvas_instance = db.Column("canvas_instance", db.String(255), nullable=True)
 
     def __init__(self, username=None, hash=None, iss=None, sub=None):
         self.username = username

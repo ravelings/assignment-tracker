@@ -1,7 +1,15 @@
-from datetime import datetime
 
-due_late = datetime.fromisoformat("2026-02-23T14:00:00Z")
+url = "https://onu.instructure.com/"
 
-due_new = datetime.fromisoformat("2026-02-25T14:00:00Z")
+def parse_url(url: str):
+    start = url.find("https://")
+    if start == -1:
+        return None
+    
+    rest = url[start + len("https://"): ]
+    host = rest.split(".", 1)[0]
+    print(f"Host = {host}")
 
-print(due_late)
+
+instance = parse_url(url)
+print(f"Instance = {instance}")

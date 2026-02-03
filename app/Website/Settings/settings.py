@@ -1,11 +1,11 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request, abort
-from urllib.parse import urlsplit
 from datetime import timezone
 from flask_login import login_required, current_user, logout_user
 from repositories.settingsRepo import SettingsRepo
 from repositories.userRepo import UserRepo
 from forms.setScoreMode import SetScoreMode
 from forms.addTokenForm import AddTokenForm
+from forms.addInstanceForm import AddInstanceForm
 from google_auth_oauthlib.flow import Flow
 from pathlib import Path
 from oauthlib.oauth2 import OAuth2Error
@@ -32,6 +32,7 @@ def settings():
     calender_id = userRepo.get_calendar_id(user_id)
     
     tokenForm = AddTokenForm()
+    instanceForm = AddInstanceForm()
     setScoreModeForm = SetScoreMode(function=int(user_settings.function))
 
     return render_template("settings.html",
@@ -39,6 +40,7 @@ def settings():
                         settings=user_settings, 
                         scoreForm=setScoreModeForm,
                         tokenForm=tokenForm,
+                        instanceForm=instanceForm,
                         calendarId=calender_id)
 
 @settings_bp.route("/dashboard/settings/function", methods=["POST"])
@@ -141,6 +143,25 @@ def _store_token(auth_code):
                             scopes=credentials.granted_scopes,
                             expiry=expiry)
     return
+
+@settings_bp.route("/dashboard/settings/setInstance", methods=["POST"])
+@login_required
+def setInstance():
+    form = AddInstanceForm()
+    if form.validate_on_submit():
+        ## get instancce from https://
+        url = form.instance.data
+        start = url.find("https://")
+        if start == -1:
+            flash("Error: Invalid instance URL", "error")
+            return redirect(url_for('settings.settings'))
+        rest = url[start + len("https://"): ]
+        instance = rest.split(".", 1)[0]
+        ## sets canvas instance on user object
+        repo = UserRepo()
+        repo.setCanvasInstance(current_user.user_id, instance)
+        flash("Instance set successfully!", "success")
+    return redirect(url_for('settings.settings'))
 
 #def _store_user_info()
 
