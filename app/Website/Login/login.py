@@ -1,6 +1,7 @@
 from pathlib import Path
 import json
 import os
+from flask_login import current_user
 from flask import render_template, request, redirect, url_for, flash, Blueprint, session
 from flask_login import login_user, logout_user
 from repositories.userRepo import UserRepo
@@ -28,6 +29,8 @@ def home():
 
 @login_bp.route("/login/", methods=["POST", "GET"]) # login page
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for("mainPage.dashboard"))
     form = LoginForm()
     recaptcha_site_key = os.getenv("RECAPTCHA_KEY")
     if form.validate_on_submit():
@@ -66,6 +69,8 @@ def login():
 
 @login_bp.route("/register/", methods=["POST", "GET"])   # register page
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for("mainPage.dashboard"))
     form = RegisterForm()
     recaptcha_site_key = os.getenv("RECAPTCHA_KEY")
     if form.validate_on_submit():

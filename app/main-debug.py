@@ -1,8 +1,6 @@
-import json
+from datetime import timedelta
 from flask import Flask
 from pathlib import Path
-import os
-from dotenv import load_dotenv
 from extensions.extensions import db, loginManager
 from Website.Login.login import login_bp
 from Website.MainPage.mainPage import mainPage_bp
@@ -13,6 +11,7 @@ from Website.Settings.settings import settings_bp
 from Website.Calendar.calendar import calendar_bp
 
 app = Flask(__name__)
+app.config["REMEMBER_COOKIE_DURATION"] = timedelta(weeks=1)
 # DB config
 # SQLite file paths on Windows need three slashes after sqlite:
 app_dir = Path(__file__).resolve().parent
