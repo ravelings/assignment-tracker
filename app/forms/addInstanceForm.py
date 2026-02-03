@@ -4,9 +4,9 @@ from wtforms.validators import InputRequired, Length
 
 class AddInstanceForm(FlaskForm):
 
-    token = StringField(
+    instance = StringField(
     validators=[InputRequired(), Length(min=1, max=200)],
-    render_kw={"placeholder": "Enter your Canvas instance"}
+    render_kw={"placeholder": "Enter your Canvas URL"}
     )
 
     submit = SubmitField("Submit")

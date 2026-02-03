@@ -186,17 +186,6 @@ def authGoogle():
     _store_token(auth_code)
 
     return url_for("settings.settings")
-    
-@settings_bp.route("/dashboard/settings/test", methods=["POST", "GET"])
-@login_required
-def calendarTest():
-    print("Calendar called!")
-    userRepo = UserRepo()
-    user = userRepo.getUserById(user_id=current_user.user_id)
-    calendar = GoogleCalendar(userObject=user)
-    calendar.create_assignment_event(due_date="2026-02-23T14:00:00Z")
-
-    return redirect(url_for("settings.settings"))
 
 @settings_bp.route("/dashboard/settings/logout", methods=["POST"])
 @login_required
