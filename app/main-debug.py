@@ -16,7 +16,7 @@ app = Flask(__name__)
 # DB config
 # SQLite file paths on Windows need three slashes after sqlite:
 app_dir = Path(__file__).resolve().parent
-db_path = app_dir / "Database" / "database_template.db"
+db_path = app_dir / "Database" / "database_local.db" # change to LOCAL database
 print(f"Dir: {db_path}")
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 #app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")

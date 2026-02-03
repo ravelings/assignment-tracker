@@ -23,8 +23,10 @@ def sync():
         userRepo = UserRepo() 
         user = userRepo.getUserById(user_id)
         # if user does not have a calendar
-        if user.calendar_id is None:
-            return 
+        print(f"Calendar ID: {user.calendar_id}")
+        if user.calendar_id is None or not user.calendar_id.strip():
+            flash("Please authorize with Google in settings first!", category="error")
+            return redirect(url_for('mainPage.dashboard'))
         assignmentRepo = AssignmentRepo()
         courseRepo = CourseRepo()
         courses = courseRepo.getAllCoursesById(user_id=user_id)
@@ -35,13 +37,14 @@ def sync():
             if assignments: to_add.extend(assignments)
         # if no assignments to add, return
         if len(to_add) < 0: 
-            print("No assignments to be added.")
-            return 
+            flash("All assignments up to date!", category="success")
+            return redirect(url_for('mainPage.dashboard'))
 
         calendar = GoogleCalendar(user)
         print(f"Adding {len(to_add)} assignments...")
         calendar.batch_create_event(to_add)
-            
-    return redirect(url_for("calendar.calendar"))
+    
+    flash(f"{len(to_add)} assignments added!", category="success")
+    return redirect(url_for('mainPage.dashboard'))  
         
         

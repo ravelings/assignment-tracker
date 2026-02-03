@@ -41,26 +41,12 @@
             <div class="row card-div">
                 <div class="card">
                     <p class="card-header1">Pending Tasks</p>
-                    <p class="card-number">12</p>
-                    <div class="tally">
-                        <p class="card-tally-pending">+2 this week</p>
-                    </div>
+                    <p class="card-number">{{pending_tally}}</p>
                 </div>
 
                 <div class="card">
                     <p class="card-header1">Completed</p>
                     <p class="card-number">{{completed}}</p>
-                    <div class="tally">
-                        <p class="card-tally-completed">+1 today</p>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <p class="card-header1">Pending Tasks</p>
-                    <p class="card-number">12</p>
-                    <div class="tally">
-                        <p class="card-tally-due">+2 this week</p>
-                    </div>
                 </div>
             </div>
 
@@ -72,8 +58,18 @@
                     </button>
                 </div>
 
-                <div class="w-auto p-0 ms-auto">
-                    <button type="button" class="btn btn-primary" id="sync" onclick=sync()>
+                <div class="w-auto ms-auto">
+                    <form class="w-auto" method="POST" action="{{url_for('calendar.sync')}}">
+                        {{googleCalendarForm.hidden_tag()}}
+                        <button type="submit" class="btn btn-primary" id="sync-calendar-btn">
+                            <img class="btn-icon" src="{{ url_for('static', filename='images/icons/sync1.svg') }}">
+                            Sync with Calendar 
+                        </button>
+                    </form>
+                </div>
+
+                <div class="w-auto p-0">
+                    <button type="button" class="btn btn-primary" id="sync-canvas-btn" onclick="sync(this)">
                         <img class="btn-icon" src="{{ url_for('static', filename='images/icons/sync1.svg') }}">
                         Sync with Canvas
                     </button>
@@ -414,9 +410,9 @@ if (alertTrigger) {
 
     }
 
-    async function sync() {
+    async function sync(buttonElement) {
         console.log("Sync starts")
-        const button = document.getElementById("sync");
+        const button = buttonElement || document.getElementById("sync-canvas-btn");
         button.classList.add("is-spinning");
         button.disabled = true;
         try {
@@ -461,6 +457,16 @@ if (alertTrigger) {
             {% if category == "deleteFalse" %}
                 <script>
                     createToast({{ msg| tojson }}, "toast-fail");
+                </script>
+            {%endif%}
+            {% if category == "error" %}
+                <script>
+                    createToast({{ msg| tojson }}, "toast-fail");
+                </script>
+            {%endif%}
+            {% if category == "success" %}
+                <script>
+                    createToast({{ msg| tojson }}, "toast-success");
                 </script>
             {%endif%}
             {% if category == "token" %}

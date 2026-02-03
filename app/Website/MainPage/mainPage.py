@@ -11,6 +11,8 @@ from forms.SubmitForm import SubmitForm
 from forms.assignment import AssignmentCreateForm
 from forms.editAssignmentForm import EditAssignmentForm
 from forms.checkForm import CheckForm
+from forms.SubmitForm import SubmitForm
+from Website.MainPage.dashboardFunctions import getPendingTasks
 
 from services.googleCalendar import GoogleCalendar
 
@@ -79,6 +81,8 @@ def dashboard():
     assignmentForm = AssignmentCreateForm().updateCourseSelect(courseRepo.getAllCoursesById(user_id))
     editAssignmentForm = EditAssignmentForm()
     checkForm = CheckForm()
+    googleCalendarForm = SubmitForm()
+    
 
     sort_key = (request.args.get("sort"))
     if sort_key is None:
@@ -94,7 +98,8 @@ def dashboard():
     }
 
     assignments = SORT_MAP.get(sort_key, assignmentRepo.getAllAssignmentById)(user_id)
-    
+    pending_tally = getPendingTasks(assignments)
+    print(f"Pending = {pending_tally}")
     # Calculate scores
     scoring_service = ScoringService(user_id)
     for assignment in assignments:
@@ -110,13 +115,15 @@ def dashboard():
 
     completed = userRepo.getComplete(user_id)
 
-    return render_template("dashboard.html", 
+    return render_template("dashboard.html",
+                        pending_tally=pending_tally, 
                         completed=completed,
                         assignments=assignments, 
                         deleteForm=deleteForm, 
                         assignmentForm=assignmentForm,
                         editForm=editAssignmentForm,
-                        checkForm=checkForm)
+                        checkForm=checkForm,
+                        googleCalendarForm=googleCalendarForm)
 
 @mainPage_bp.route("/userinfo/")
 @login_required
@@ -154,7 +161,7 @@ def syncAssignments():
     token = userRepo.getCanvasToken(user_id)
 
     if token is None:
-        flash("Error: Token not set, please set up token before syncing.", category="token")
+        flash("Error: Token not set or expired, please set up token in settings before syncing.", category="token")
         return jsonify({"status": "failed"})
     
     client = CanvasClient(user_id=user_id, token=token, instance="onu")
