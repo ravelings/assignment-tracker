@@ -9,10 +9,13 @@ Flask-SQLAlchemy
 psycopg2-binary
 Flask-WTF
 WTForms
-## google OAUTH
+## Google API
 google-api-python-client
+google-cloud-recaptcha-enterprise
+## Google OAuth
 google-auth
 google-auth-httplib2
 google-auth-oauthlib
+
 oauthlib
 requests
