@@ -29,8 +29,6 @@ def settings():
         
     userRepo = UserRepo()
     
-    calender_id = userRepo.get_calendar_id(user_id)
-    
     tokenForm = AddTokenForm()
     instanceForm = AddInstanceForm()
     setScoreModeForm = SetScoreMode(function=int(user_settings.function))
@@ -40,8 +38,7 @@ def settings():
                         settings=user_settings, 
                         scoreForm=setScoreModeForm,
                         tokenForm=tokenForm,
-                        instanceForm=instanceForm,
-                        calendarId=calender_id)
+                        instanceForm=instanceForm)
 
 @settings_bp.route("/dashboard/settings/function", methods=["POST"])
 @login_required

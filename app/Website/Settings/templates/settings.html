@@ -140,7 +140,7 @@
         <h1 class="heading1 mb-1 mt-1">Integrations</h1>
         <div class="row" id="integrations">
             <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
-            {% if calendarId is not none %}
+            {% if user.refresh_token is not none %}
                 <span class="pr-1 w-auto">Google Calendar</span>
                 <button class="btn btn-secondary" onclick="client.requestCode();">
                 Reauthorize with Google</button>
@@ -155,7 +155,14 @@
             <form method="POST" action="{{ url_for('settings.setToken') }}">
                 {{tokenForm.csrf_token(id='tokenForm_csrf_token')}}
                 <div class="row w-auto align-items-center">
-                    <span class="pr-1 w-auto">Canvas Token</span>
+                <span class="required-span d-inline-flex flex-column pr-1 w-auto">
+                    <span>Canvas Token</span>
+                    {% if user.token is not none%}
+                        <small class="text-success">Already Set</small>
+                        {% else %}
+                        <small class="text-danger">Not set</small>
+                        {% endif %}
+                </span>
                         <button type="button" class="btn w-auto" onclick="showTokenModal()">
                             <img src="{{ url_for('static', filename='images/icons/info.svg') }}">
                         </button>
@@ -172,7 +179,11 @@
                 <div class="row w-auto align-items-center">
                     <span class="required-span d-inline-flex flex-column pr-1 w-auto">
                         <span>Canvas URL</span>
-                        <small class="text-danger">Required</small>
+                        {% if user.token is not none%}
+                        <small class="text-success">Already Set</small>
+                        {% else %}
+                        <small class="text-danger">Not set</small>
+                        {% endif %}
                     </span>
                         <button type="button" class="btn w-auto" onclick="showInstanceModal()">
                             <img src="{{ url_for('static', filename='images/icons/info.svg') }}">
@@ -182,6 +193,7 @@
                     <button type="submit" class="btn btn-submit d-flex justify-content-center">
                         <img class="" src="{{ url_for('static', filename='images/icons/check1.svg')}}">
                     </button>
+
                 </div>
             </form>
 
