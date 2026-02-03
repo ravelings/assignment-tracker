@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm 
-from wtforms import StringField, PasswordField, SubmitField
+from wtforms import StringField, PasswordField, SubmitField, HiddenField
 from wtforms.validators import InputRequired, Length
 
 class LoginForm(FlaskForm):
@@ -7,6 +7,7 @@ class LoginForm(FlaskForm):
                         render_kw={"placeholder": "Username"})
     password = PasswordField(validators=[InputRequired(), Length(min=7)],
                             render_kw={"placeholder": "Password"})
+    recaptcha_token = HiddenField()
     submit = SubmitField("Login")
         
 class RegisterForm(FlaskForm):

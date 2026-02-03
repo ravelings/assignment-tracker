@@ -15,6 +15,7 @@ a:link, a:visited, a:hover, a:active {
 }
 
 .main-box {
+    padding: 2rem;
     height: 33rem;
     bottom: -10px;
     width: 25rem;
@@ -80,6 +81,7 @@ a:link, a:visited, a:hover, a:active {
 .logo {
     width: 10rem;
     height: 5rem;
+    transform: translateY(20%);
 }
 
 .form-img {
@@ -122,4 +124,8 @@ h1 {
 .hyperlink:hover {
     color:#202020;
     font-weight: bold;
+}
+
+.g-sign {
+    transform: translateY(-50%);
 }

@@ -1,6 +1,6 @@
 from pathlib import Path
 import json
-
+import os
 from flask import render_template, request, redirect, url_for, flash, Blueprint, session
 from flask_login import login_user, logout_user
 from repositories.userRepo import UserRepo
@@ -8,6 +8,8 @@ from services.auth_service import verify_password
 from forms.LoginRegister import LoginForm, RegisterForm
 from forms.UsernameForm import UsernameForm
 from extensions.extensions import loginManager
+from services.recaptcha_service import create_assessment
+from flask import request
 
 from google.oauth2 import id_token
 from google.auth.transport import requests
@@ -27,27 +29,64 @@ def home():
 @login_bp.route("/login/", methods=["POST", "GET"]) # login page
 def login():
     form = LoginForm()
+    recaptcha_site_key = os.getenv("RECAPTCHA_KEY")
     if form.validate_on_submit():
+        print("Validated!")
+        ## Captcha verificiation
+        recaptcha_token = request.form.get("g-recaptcha-response")
+        print(f"Captcha Token {recaptcha_token}")
+        if not recaptcha_token or not recaptcha_token.strip():
+            print("Token missing!")
+            flash("Captcha token missing; please try again.", category="error")
+            return redirect(url_for("login.login"))
+        
+        project_id = os.getenv("GOOGLE_PROJECT_ID")
+        key = recaptcha_site_key
+        print("Creating response...")
+        response = create_assessment(project_id=project_id, recaptcha_key=key, 
+                                    token=recaptcha_token, recaptcha_action="LOGIN")
+        if response is None or response.risk_analysis.score < 0.5:
+            print(f"CAPTCHA FAILED: {response.risk_analysis.reasons}")
+            flash("Captcha failed! Please try again", category="error")
+            return redirect(url_for("login.login"))
+        ## User verification
         username = form.username.data
         user = repo.getUserByName(username)
-        
         if user is not None:
             password = form.password.data
             verify = verify_password(hashed_password=user.hash, password=password)
             if verify:
                 login_user(user)
                 return redirect(url_for("mainPage.dashboard"))
-            else:
-
-                flash("Password incorrect or user not found!", category="error")
-                return redirect(url_for("login.login"))
+            
+        flash("Password incorrect or user not found!", category="error")
+        return redirect(url_for("login.login"))
     
     return render_template("login.html", form=form)
 
 @login_bp.route("/register/", methods=["POST", "GET"])   # register page
 def register():
     form = RegisterForm()
+    recaptcha_site_key = os.getenv("RECAPTCHA_KEY")
     if form.validate_on_submit():
+        
+        print("Validated!")
+        ## Captcha verificiation
+        recaptcha_token = request.form.get("g-recaptcha-response")
+        print(f"Captcha Token {recaptcha_token}")
+        if not recaptcha_token or not recaptcha_token.strip():
+            print("No captcha token")
+            flash("Captcha token missing; please try again.", category="error")
+            return redirect(url_for("login.register"))
+        project_id = os.getenv("GOOGLE_PROJECT_ID")
+        key = recaptcha_site_key
+        print("Creating response...")
+        response = create_assessment(project_id=project_id, recaptcha_key=key, 
+                                    token=recaptcha_token, recaptcha_action="LOGIN")
+        if response is None or response.risk_analysis.score < 0.5:
+            print(f"CAPTCHA FAILED: {response.risk_analysis.reasons}")
+            flash("Captcha failed! Please try again", category="error")
+            return redirect(url_for("login.register"))
 
         username = form.username.data
         password = form.password.data
@@ -155,3 +194,7 @@ def createGoogleUsername():
         else: 
             flash("Error in creating Username", category="error")
     return render_template('username.html', form=usernameForm)
+
+@login_bp.route("login/captcha", methods=["POST"])
+def captchaVerify():
+    pass
