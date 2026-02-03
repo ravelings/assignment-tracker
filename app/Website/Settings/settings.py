@@ -18,6 +18,7 @@ settings_bp = Blueprint("settings", __name__, template_folder="templates")
 @settings_bp.route("/dashboard/settings/", methods=["GET", "POST"])
 @login_required
 def settings():
+    print(f"URL: {request.scheme}://{request.host}")
     userRepo = UserRepo()
     user = userRepo.getUserById(user_id=current_user.user_id)
     user_id = current_user.user_id
