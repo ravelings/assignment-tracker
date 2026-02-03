@@ -1,6 +1,5 @@
-import json
+from datetime import timedelta
 from flask import Flask
-from pathlib import Path
 import os
 from dotenv import load_dotenv
 from extensions.extensions import db, loginManager
@@ -15,7 +14,9 @@ from Website.Calendar.calendar import calendar_bp
 load_dotenv()
 
 app = Flask(__name__)
-# DB config
+## app configs
+app.config["REMEMBER_COOKIE_DURATION"] = timedelta(weeks=1)
+## DB config
 
 # app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 

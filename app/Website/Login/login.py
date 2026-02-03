@@ -56,7 +56,7 @@ def login():
             password = form.password.data
             verify = verify_password(hashed_password=user.hash, password=password)
             if verify:
-                login_user(user)
+                login_user(user, remember=True)
                 return redirect(url_for("mainPage.dashboard"))
             
         flash("Password incorrect or user not found!", category="error")
@@ -162,7 +162,7 @@ def loginWithGoogle():
         if verify is True:
             userRepo = UserRepo()
             user = userRepo.getGoogleUser(iss=idinfo['iss'], sub=idinfo['sub'])
-            login_user(user=user)
+            login_user(user=user, remember=True)
             return redirect(url_for("mainPage.dashboard"))
         if verify is False:
             session['pending_google'] = {
@@ -189,7 +189,7 @@ def createGoogleUsername():
         user = _create_google(username=username, sub=sub, iss=iss)
         if user: 
             session.pop('pending_google', None)
-            login_user(user)
+            login_user(user, remember=True)
             return redirect(url_for('mainPage.dashboard'))
         else: 
             flash("Error in creating Username", category="error")
