@@ -25,7 +25,11 @@ def load_user(user_id):
 
 @login_bp.route("/")
 def home():
-    return redirect(url_for("login.login"))
+    return render_template("home.html")
+
+@login_bp.route("/privacy")
+def privacy():
+    return render_template("privacy_policy.html")
 
 @login_bp.route("/login/", methods=["POST", "GET"]) # login page
 def login():
@@ -48,8 +52,16 @@ def login():
         print("Creating response...")
         response = create_assessment(project_id=project_id, recaptcha_key=key, 
                                     token=recaptcha_token, recaptcha_action="LOGIN")
-        if response is None or response.risk_analysis.score < 0.5:
-            print(f"CAPTCHA FAILED: {response.risk_analysis.reasons}")
+        if response is None:
+            print("CAPTCHA FAILED: no assessment response returned")
+            flash("Captcha failed! Please try again", category="error")
+            return redirect(url_for("login.login"))
+        
+        risk_analysis = getattr(response, "risk_analysis", None)
+        score = getattr(risk_analysis, "score", 0)
+        reasons = getattr(risk_analysis, "reasons", [])
+        if risk_analysis is None or score < 0.5:
+            print(f"CAPTCHA FAILED: {reasons if reasons else 'score below threshold'}")
             flash("Captcha failed! Please try again", category="error")
             return redirect(url_for("login.login"))
         ## User verification
@@ -88,8 +100,15 @@ def register():
         print("Creating response...")
         response = create_assessment(project_id=project_id, recaptcha_key=key, 
                                     token=recaptcha_token, recaptcha_action="LOGIN")
-        if response is None or response.risk_analysis.score < 0.5:
-            print(f"CAPTCHA FAILED: {response.risk_analysis.reasons}")
+        if response is None:
+            print("CAPTCHA FAILED: no assessment response returned")
+            flash("Captcha failed! Please try again", category="error")
+            return redirect(url_for("login.register"))
+        risk_analysis = getattr(response, "risk_analysis", None)
+        score = getattr(risk_analysis, "score", 0)
+        reasons = getattr(risk_analysis, "reasons", [])
+        if risk_analysis is None or score < 0.5:
+            print(f"CAPTCHA FAILED: {reasons if reasons else 'score below threshold'}")
             flash("Captcha failed! Please try again", category="error")
             return redirect(url_for("login.register"))
 
