@@ -1,5 +1,5 @@
 :root{
-    --shadow: 0px 2px 2px hsla(0, 0%, 0%, 0.07), 0px 2.5px 2.5px hsla(0, 0%, 0%, 0.10)
+    --shadow: 0px 2px 2px hsla(0, 0%, 0%, 0.07), 0px 2.5px 2.5px hsla(0, 0%, 0%, 0.10);
 
     --bg: oklch(0.96 0.01 255);
     --bg-light: oklch(1 0.01 255);
@@ -20,6 +20,42 @@
     color: var(--bg);
     box-shadow: var(--shadow);
     margin-right: 0rem;
+}
+
+.btn-submit {
+    outline: none;
+    width: 5rem;
+    padding: 0.5rem;
+    margin-left: 2rem;
+    border-radius: 1rem;
+    background: transparent;
+    border: 1.5px solid #200202;
+    color: #202020;
+    position: relative;
+    transition: ease-in-out 0.15s;
+}
+
+.btn-submit:hover {
+    background: #200202;
+    border: 1.5px solid #200202;
+    color: white;
+}
+
+.btn-start {
+    padding: 0.5rem;
+    outline: none;
+    border-radius: 1rem;
+    border: 1.5px solid #200202;
+    background: #200202;
+    color: white;
+    position: relative;
+    transition: ease-in-out 0.15s;
+}
+
+.btn-start:hover {
+    background: transparent;
+    border: 1.5px solid #200202;
+    color: #202020;
 }
 
 .btn-create {

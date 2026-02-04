@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/icons/logo.svg') }}">
+    <title>Osmo Tracker</title>
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap"
+        rel="stylesheet" />
+    <!-- Bootstrap CSS (v4.3.1) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='base.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=dashboard" />  
+    <!-- Local CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='button.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='privacy.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='home.css') }}">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+    <a class="navbar-brand" href="#">
+        <img src="{{ url_for('static', filename='images/icons/logo.svg') }}" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+        Osmo
+    </a>
+        <div class="navbar-nav">
+            <a class="nav-link" 
+            href="https://github.com/ravelings/assignment-tracker/tree/main"
+            target="_blank">GitHub</a>
+            <button
+            class="btn-submit"
+            onclick="window.location.href='{{ url_for('login.login') }}'">Login</button>
+        </div>
+        </div>
+    </div>
+</nav>
+
+<div class="col content">
+    <h1>Privacy Policy</h1>
+    <small>Last updated: Feburary 4, 2026</small>
+    <br>
+
+    <p>
+    This Privacy Policy explains how Osmos (“the Application”, “we”, “us”) 
+    accesses and uses information when you choose to connect third-party services such as 
+    Google Calendar and Canvas LMS.
+    </p>
+
+    <h2>1. Overview</h2>
+
+    <p>
+    The Application is designed to help students view academic assignments and 
+    optionally synchronize them with a personal calendar.
+    We prioritize data minimization and only access information strictly necessary 
+    to provide core functionality.
+
+    We do not sell, rent, or monetize user data.
+    </p>
+
+    <h2>2. Information We Access</h2>
+    <h3>2.1 Google Calendar Data</h3>
+    <p>
+        If you connect a Google Calendar account, the Application uses Google OAuth
+        to request the minimal scopes needed to create and update assignment events
+        inside a dedicated Osmos Tracker calendar that is associated with your user account.
+    </p>
+    <p>Data accessed includes:</p>
+    <ul>
+        <li>Calendar metadata required to create or select the Osmos Tracker calendar (calendar ID and timezone).</li>
+        <li>Event fields derived from your assignments, such as titles, descriptions, and due dates/times.</li>
+    </ul>
+    <p>The Application does not access:</p>
+    <ul>
+        <li>Gmail, Google Drive, Google Classroom, or other Google products.</li>
+        <li>Events outside of the Osmos Tracker calendar that you explicitly authorize.</li>
+    </ul>
+
+    <h3>2.2 Canvas LMS Data</h3>
+    <p>
+    If you connect a Canvas LMS account, the Application accesses read-only 
+    data via the Canvas API:
+    </p>
+    <ul>
+        <li>Course names</li>
+        <li>Assignment titles</li>
+        <li>Assignment due dates</li>
+    </ul>
+    <p>The Application does not access:</p>
+    <ul>
+        <li>Grades</li>
+        <li>Submissions</li>
+        <li>Messages</li>
+        <li>Files</li>
+        <li>Personal communications</li>
+    </ul>
+    <p>
+    Canvas is a product of <strong>Instructure</strong>.
+    This project is not affiliated with or endorsed by Instructure.
+    </p>
+
+    <h2>3. How Information Is Used</h2>
+    <p>Accessed data is used solely to:</p>
+    <ul>
+        <li>Display courses and assignments inside the Application.</li>
+        <li>Allow users to optionally create Google Calendar events for assignments.</li>
+    </ul>
+    <p>Data is not used for:</p>
+    <ul>
+        <li>Advertising</li>
+        <li>Analytics</li>
+        <li>Profiling</li>
+        <li>Marketing</li>
+        <li>Resale or sharing with third parties</li>
+    </ul>
+
+    <h2>4. Data Storage and Retention</h2>
+    <h3>4.1 Canvas LMS</h3>
+    <p>If the user connects Canvas LMS, Canvas course and assignment metadata (such as course names, assignment titles, and due dates)
+    is stored within the Application for the purpose of displaying and managing assignments in the tracker.
+    The Application does not store grades, submissions, messages, files, or personal communications from Canvas.</p>
+    <h3>4.2 Google Calendar</h3>
+    <p>If the user connects Google Calendar, data is accessed only after user consent and is not permanently stored.
+    Stored assignment data is retained only for as long as the user maintains an active account or connected Canvas integration 
+    and is deleted when the user disconnects the integration or removes their account.</p>
+
+    <h2>5. Data Sharing</h2>
+    <p>We do not share user data with third parties.</p>
+    <p>Data obtained through Canvas LMS and Google APIs are used only to perform actions explicitly requested by the user within the Application.</p>
+
+    <h2>6. User Consent and Control</h2>
+    <ul>
+        <li>All third-party access requires explicit user consent.</li>
+        <li>Users may revoke Google account access at any time via their Google Account settings.</li>
+        <li>Canvas API tokens can be revoked directly from the user's Canvas account.</li>
+        <li>The Application respects all revocations immediately.</li>
+    </ul>
+
+    <h2>7. Data Security</h2>
+    <p>Reasonable technical and organizational safeguards are implemented to protect 
+    authorized data from unauthorized access, disclosure, or misuse.</p>
+
+    <h2>8. Google API Compliance</h2>
+    <p>The Application’s use of information received from Google APIs adheres 
+    to the Google API Services User Data Policy, including the Limited Use requirements.</p>
+
+    <h2>9. Children’s Privacy</h2>
+    <p>The Application is not directed toward children under the age of 13 and 
+    does not knowingly collect personal information from children.</p>
+
+    <h2>10. Changes to This Policy</h2>
+    <p>This Privacy Policy may be updated from time to time.</p>
+    <p>Material changes will be reflected by updating the effective date above.</p>
+
+    <h2>11. Contact Information</h2>
+    <p>If you have questions about this Privacy Policy, you may contact:</p>
+    <ul>
+        <li>Developer: Rain Chow</li>
+        <li>Email: <a href="#">chowemmeline@gmail.com</a></li>
+        <li>Project Repository: 
+        <a href="https://github.com/ravelings/assignment-tracker">
+        Link</a>
+        </li>
+    </ul>
+
+</div>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+        <img src="{{ url_for('static', filename='images/icons/logo.svg') }}" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+        Osmo
+    </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="/privacy">Privacy Policy</a>
+        </li>
+        </ul>
+    </div>
+    </div>
+    </div>
+    </div>
+</nav>
+
+</body>
