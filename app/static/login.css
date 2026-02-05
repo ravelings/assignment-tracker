@@ -129,3 +129,9 @@ h1 {
 .g-sign {
     transform: translateY(-50%);
 }
+
+.link{
+    outline: none;
+    text-decoration: none;
+    color: #202020;
+}

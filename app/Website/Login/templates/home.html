@@ -43,13 +43,15 @@
 
 <div class="container hero-section">
     <div class="hero-text-box">
-        <p class="hero-eyebrow">Osmo Tracker</p>
+        <p class="hero-eyebrow">
+        <img src="{{ url_for('static', filename='images/icons/logo.svg') }}" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+        Osmo Tracker</p>
         <h1>Master your assignments with Osmo.</h1>
         <p class="hero-copy">A minimalistic assignment tracker
-        built for students who value focus and simplicity.</p>
+        built by a student for students who value focus and simplicity.</p>
         <button
         class="btn-start"
-        onclick="window.location.href='{{ url_for('login.login') }}'">Get Started for Free.</button>
+        onclick="window.location.href='{{ url_for('login.register') }}'">Get Started for Free.</button>
     </div>
     <img class="img-main" 
         src="{{ url_for('static', filename='images/home/mainimage.png') }}" alt="Student using Osmo Tracker">
