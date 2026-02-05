@@ -25,7 +25,10 @@
 <body>
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Osmo</a>
+    <a class="navbar-brand" href="#">
+        <img src="{{ url_for('static', filename='images/icons/logo.svg') }}" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+        Osmo
+    </a>
         <div class="navbar-nav">
             <a class="nav-link" 
             href="https://github.com/ravelings/assignment-tracker/tree/main"
@@ -59,26 +62,53 @@
                 <img 
                 class="feature-card-icon"
                 src="{{ url_for('static', filename='images/icons/canvasicon.png') }}">
-                <p class="card-header1">Canvas Integration</p>
+                <p class="card-header1">Canvas LMS Integration</p>
             </div>
-            <p class="card-description">Placeholder copy for Canvas sync. Automatically pull course assignments into Osmo without manual entry.</p>
+            <p class="card-description">Automatically pull assignments and courses into Osmo without manual entry.</p>
         </div>
 
         <div class="card feature-card">
             <div class="feature-card-header">
-                <span class="feature-card-icon" aria-hidden="true">Icon</span>
+                <img 
+                class="feature-card-icon"
+                src="{{ url_for('static', filename='images/icons/googlecalendar.png') }}">
                 <p class="card-header1">Google Calendar</p>
             </div>
-            <p class="card-description">Placeholder copy for calendar sync. Send deadlines to Google Calendar so reminders follow you everywhere.</p>
+            <p class="card-description">Send assignments on Osmo to Google Calendar so reminders follow you everywhere.</p>
         </div>
 
         <div class="card feature-card">
             <div class="feature-card-header">
-                <span class="feature-card-icon" aria-hidden="true">Icon</span>
+                <img 
+                class="feature-card-icon"
+                src="{{ url_for('static', filename='images/icons/exclamation.svg') }}">
                 <p class="card-header1">Priority System</p>
             </div>
-            <p class="card-description">Placeholder copy for priority tagging. Flag urgent work, assign focus levels, and plan the right workload.</p>
+            <p class="card-description">Smart system that assigns a priority score to assignments based 
+            on effort levels, course weight and due dates.</p>
         </div>
     </div>
 </section>
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+        <img src="{{ url_for('static', filename='images/icons/logo.svg') }}" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+        Osmo
+    </a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link active" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/privacy">Privacy Policy</a>
+        </li>
+        </ul>
+    </div>
+    </div>
+    </div>
+    </div>
+</nav>
+
 </body>

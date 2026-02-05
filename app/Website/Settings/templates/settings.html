@@ -157,7 +157,7 @@
                 <div class="row w-auto align-items-center">
                 <span class="required-span d-inline-flex flex-column pr-1 w-auto">
                     <span>Canvas Token</span>
-                    {% if user.token is not none%}
+                    {% if user.canvas_token is not none%}
                         <small class="text-success">Already Set</small>
                         {% else %}
                         <small class="text-danger">Not set</small>
@@ -179,7 +179,7 @@
                 <div class="row w-auto align-items-center">
                     <span class="required-span d-inline-flex flex-column pr-1 w-auto">
                         <span>Canvas URL</span>
-                        {% if user.token is not none%}
+                        {% if user.canvas_instance is not none%}
                         <small class="text-success">Already Set</small>
                         {% else %}
                         <small class="text-danger">Not set</small>
