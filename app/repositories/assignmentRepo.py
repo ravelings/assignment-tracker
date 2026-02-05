@@ -266,3 +266,10 @@ class AssignmentRepo:
         assignment.event_id = event_id 
         self.commit()
         return
+
+    def deleteAllCanvasAssignments(self, user_id):
+        Assignment.query.filter(
+            Assignment.user_id == user_id,
+            Assignment.canvas_assignment_id.isnot(None)
+        ).delete(synchronize_session=False)
+        self.commit()

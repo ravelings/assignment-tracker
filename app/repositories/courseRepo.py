@@ -117,3 +117,10 @@ class CourseRepo:
         else:
             self.commit()
             return True
+        
+    def deleteAllCanvasCourses(self, user_id):
+        Course.query.filter(
+            Course.user_id == user_id,
+            Course.canvas_course_id.isnot(None)
+        ).delete(synchronize_session=False)
+        self.commit()

@@ -119,6 +119,18 @@ class GoogleCalendar():
         except HttpError as e:
             print(f"An error has occured: {e}")
 
+    def delete_calendar(self):
+        print("Delete calendar called")
+    
+        try:
+            service = build("calendar", "v3", credentials=self.cred)
+            request_delete = service.calendars().delete(calendarId=self.calendar_id)
+            response = request_delete.execute()
+            print(f"Calendar Delete Response: {response}")
+            
+        except HttpError as e:
+            print(f"An error has occured: {e}")
+
     def create_assignment_event(self, assignment):
         event = self._create_assignment_body(assignment)
         for attempt in range(2):

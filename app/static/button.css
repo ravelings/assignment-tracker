@@ -163,3 +163,16 @@
     font-weight: 550;
     color: #64748b;
 }
+
+.btn-delete-outline {
+    border-radius: 0.25rem;
+    border: 1.5px solid #df6262;
+    color: #df6262;
+}
+
+.btn-delete-outline:hover {
+    border-radius: 0.25rem;
+    border: 1.5px solid #df6262;
+    background-color: #df6262;
+    color: white;
+}

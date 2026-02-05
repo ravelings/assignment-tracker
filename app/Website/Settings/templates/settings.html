@@ -79,6 +79,47 @@
     </div>
     </template>
 
+    <template id="tmpl-delete">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalScrollableTitle">Delete Canvas Data</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <p><strong>WARNING! </strong> This will delete your Canvas token and all your Canvas assignments
+        from Osmo.</p>
+        <p>This action is <strong>irreversible.</strong></p>
+        
+        <div class="modal-footer">
+            <form method="POST" action="{{url_for('settings.deleteCanvasData')}}">
+                {{submitForm.hidden_tag()}}
+                {{submitForm.submit(class="btn btn-delete", value="Delete")}}
+            </form>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+        </div>
+    </div>
+    </template>
+
+    <template id="tmpl-delete-google">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalScrollableTitle">Delete Google Calendar</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+        <p><strong>WARNING! </strong> This will delete your Google Token and any Google Calendar 
+        and its events made by Osmo.</p>
+        <p>This action is <strong>irreversible.</strong></p>
+        
+        <div class="modal-footer">
+            <form method="POST" action="{{url_for('settings.deleteGoogleData')}}">
+                {{deleteForm.hidden_tag()}}
+                {{deleteForm.submit(class="btn btn-delete", value="Delete")}}
+            </form>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    </template>
+
     <div class="col">
         <div class="row" id="accountInfo">
             <h1 class="heading1">Account</h1>
@@ -198,14 +239,19 @@
             </form>
 
         </div>
-        <div class="row mt-5" id="logout">
+        <h1 class="heading1 mb-2 mt-5">Danger Zone</h1>
+
             <form method="POST" action="{{ url_for('settings.logout') }}">
                 <button type="submit" class="btn btn-primary w-auto">
                     <img class="icon" src="{{ url_for('static', filename='images/icons/logout.svg') }}">
                     Logout from Account
                 </button>
             </form>
+
+            <p><button class="btn btn-delete-outline w-auto mt-2" onclick="showCanvasModal()">Remove Canvas Data</button></p>
+            <p><button class="btn btn-delete-outline w-auto mt-2" onclick="showGoogleModal()">Remove Google Calendar</button></p>
         </div>
+        
     </div>
 </div>
 {% endblock %}
@@ -230,6 +276,20 @@
     function showInstanceModal() {
         dialog.replaceChildren(
             document.getElementById("tmpl-instance").content.cloneNode(true)
+        );
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
+
+        function showCanvasModal() {
+        dialog.replaceChildren(
+            document.getElementById("tmpl-delete").content.cloneNode(true)
+        );
+        bootstrap.Modal.getOrCreateInstance(modal).show();
+    }
+
+    function showGoogleModal() {
+        dialog.replaceChildren(
+            document.getElementById("tmpl-delete-google").content.cloneNode(true)
         );
         bootstrap.Modal.getOrCreateInstance(modal).show();
     }
@@ -273,6 +333,11 @@
             {% if category == "success" %}
                 <script>
                     createToast({{msg|tojson}}, "toast-success")
+                </script>
+            {%endif%}
+            {% if category == "fail" %}
+                <script>
+                    createToast({{msg|tojson}}, "toast-fail")
                 </script>
             {%endif%}
         {%endfor%}

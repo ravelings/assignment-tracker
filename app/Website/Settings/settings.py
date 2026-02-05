@@ -6,9 +6,13 @@ from repositories.userRepo import UserRepo
 from forms.setScoreMode import SetScoreMode
 from forms.addTokenForm import AddTokenForm
 from forms.addInstanceForm import AddInstanceForm
+from forms.deleteForm import DeleteForm
+from forms.SubmitForm import SubmitForm
 from google_auth_oauthlib.flow import Flow
 from pathlib import Path
 from oauthlib.oauth2 import OAuth2Error
+from repositories.assignmentRepo import AssignmentRepo
+from repositories.courseRepo import CourseRepo
 from services.googleCalendar import GoogleCalendar
 
 
@@ -32,13 +36,17 @@ def settings():
     tokenForm = AddTokenForm()
     instanceForm = AddInstanceForm()
     setScoreModeForm = SetScoreMode(function=int(user_settings.function))
+    submitForm = SubmitForm()
+    deleteForm = DeleteForm()
 
     return render_template("settings.html",
                         user = user, 
                         settings=user_settings, 
                         scoreForm=setScoreModeForm,
                         tokenForm=tokenForm,
-                        instanceForm=instanceForm)
+                        instanceForm=instanceForm,
+                        submitForm = submitForm,
+                        deleteForm = deleteForm)
 
 @settings_bp.route("/dashboard/settings/function", methods=["POST"])
 @login_required
@@ -189,3 +197,48 @@ def authGoogle():
 def logout():
     logout_user()
     return redirect(url_for('login.login'))
+
+@settings_bp.route("/dashboard/settings/delete/canvas", methods=["POST"])
+@login_required
+def deleteCanvasData():
+    form = SubmitForm()
+    if form.validate_on_submit():
+        user_id = current_user.user_id
+        userRepo = UserRepo()
+        token = userRepo.getCanvasToken(user_id)
+        if token is None:
+            flash("Error! Canvas token not set!", "fail")
+            return redirect(url_for("settings.settings"))
+        
+        userRepo.deleteCanvasToken(user_id)
+        assignmentRepo = AssignmentRepo()
+        assignmentRepo.deleteAllCanvasAssignments(user_id)
+        courseRepo = CourseRepo()
+        courseRepo.deleteAllCanvasCourses(user_id)
+        flash("Delete successful!", "success")
+    return redirect(url_for("settings.settings"))
+
+@settings_bp.route("/dashboard/settings/delete/google", methods=["POST"])
+@login_required
+def deleteGoogleData():
+    form = DeleteForm()
+    if form.validate_on_submit():
+        user_id = current_user.user_id
+        userRepo = UserRepo()
+        user = userRepo.getUserById(user_id)
+        refresh_token = user.refresh_token
+        if refresh_token is None:
+            flash("Error! Google has not been authorized", "error")
+            return redirect(url_for("settings.settings"))
+        
+        calendar_id = user.calendar_id
+        if calendar_id is None or not calendar_id.strip():
+            userRepo.deleteGoogleTokens(user_id)
+            flash("Your Google information has been successfully removed!", "success")
+            return redirect(url_for("settings.settings"))
+        
+        calendar = GoogleCalendar(user)
+        calendar.delete_calendar()
+        userRepo.deleteGoogleTokens(user_id)
+        flash("Your Google information and Calendar has been successfully removed!", "success")
+        return redirect(url_for("settings.settings"))

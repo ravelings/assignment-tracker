@@ -66,6 +66,9 @@ class UserRepo:
         user.expiry = expiry 
         self.commit()
 
+    def getRefreshToken(self, user_id):
+        return (User.query.filter_by(user_id=user_id).first()).refresh_token
+
     def set_calendar_id(self, user_id, calendar_id):
         user = User.query.filter_by(user_id=user_id).first()
         user.calendar_id = calendar_id 
@@ -111,4 +114,18 @@ class UserRepo:
     def decrementComplete(self, user_id):
         user = User.query.filter_by(user_id=user_id).first()
         user.total_completed -= 1
+        self.commit()
+        
+    def deleteCanvasToken(self, user_id):
+        user = User.query.filter_by(user_id=user_id).first()
+        user.canvas_token = None
+        self.commit()
+        
+    def deleteGoogleTokens(self, user_id):
+        user = User.query.filter_by(user_id=user_id).first()
+        user.google_token = None 
+        user.refresh_token = None 
+        user.granted_scopes = None 
+        user.expiry = None
+        
         self.commit()

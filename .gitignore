@@ -3,3 +3,4 @@ apiTest.py
 app/Database/database_local.db
 .env
 app/Database/client_secret.json
+app/client_secret.json
