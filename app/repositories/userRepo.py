@@ -127,5 +127,6 @@ class UserRepo:
         user.refresh_token = None 
         user.granted_scopes = None 
         user.expiry = None
+        user.calendar_id = None
         
         self.commit()
