@@ -1,15 +1,10 @@
+import requests
 
-url = "https://onu.instructure.com/"
+token = "20984~RenZEFHtXkHeXMeZDWfVEfLJVDt3vePCB2e48fEL36vvxwCWErZckF22Ufzc9uMZ"
 
-def parse_url(url: str):
-    start = url.find("https://")
-    if start == -1:
-        return None
-    
-    rest = url[start + len("https://"): ]
-    host = rest.split(".", 1)[0]
-    print(f"Host = {host}")
+request = "https://onu.instructure.com/api/v1/users/self/courses/12946/assignments?per_page=50&access_token=" + token 
 
+resp = requests.get(request)
 
-instance = parse_url(url)
-print(f"Instance = {instance}")
+assignments = resp.json() 
+print(assignments)

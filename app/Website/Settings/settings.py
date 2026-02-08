@@ -75,7 +75,7 @@ def setToken():
     form = AddTokenForm()
     if form.validate_on_submit():
         repo = UserRepo()
-        token = form.token.data
+        token = (form.token.data).strip()
         set = repo.setCanvasToken(user_id=current_user.user_id, token=token)
 
         if set:

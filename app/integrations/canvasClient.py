@@ -3,14 +3,14 @@ import logging
 import requests 
 from models.assignment import Assignment
 from models.courses import Course
-from datetime import datetime, timezone, date
+from datetime import datetime, timezone, date, timedelta
 
 class CanvasClient:
 
     def __init__(self, user_id, token, instance):
         self.user_id = user_id
         self.token = token
-        self.base_url = "https://"+instance+".instructure.com/api/v1/"
+        self.base_url = "https://"+instance+".instructure.com/api/v1/users/self/"
 
     def verifyToken(self):
         pass 
@@ -83,30 +83,12 @@ class CanvasClient:
             return courseObject
         return None
 
-    def getAssignmentsByCourse(self, user_id: int, course: Course):
-        state = course.workflow_state
-        end_at = course.end_at
-        today = date.today().isoformat()
-        print(f"Course Object: {course}")
-        if state not in ("available", "active", "published"):
-            print("Course unavailable")
-            return None
-        if end_at:
-            if today > end_at:
-                print("Course expired")
-                return None
-        canvas_course_id = str(course.canvas_course_id)
-        course_id = course.course_id
-        request_url = self.base_url + "courses/" + canvas_course_id + "/assignments"
-        request = request_url+"?access_token="+self.token
-
-        print(f"Fetching assignment for {course}")
-        assignments = requests.get(request).json()
-        print(f"Assignment Object obtained")
-        assignment_list = []
-
+    def _create_assignment_list(self, user_id, course_id, canvas_course_id, assignments: Assignment):
+        assignments_list = []
+        continue_page = True
+        
         for assignment in assignments:
-            # print(f"Assigment Object: {assignment}")
+        # print(f"Assigment Object: {assignment}")
             state = assignment['workflow_state']
             due = assignment['due_at']
             if state != "published":
@@ -121,13 +103,18 @@ class CanvasClient:
             created = datetime.fromisoformat(assignment['created_at'])
             updated = datetime.fromisoformat(assignment['updated_at'])
             raw_unlock = assignment.get("unlock_at")
-
+            
+            today = datetime.now(timezone.utc).date()
+            due = due_date.date()
+            
+            if due < today:
+                continue
+            
             if raw_unlock:
                 unlock = datetime.fromisoformat(raw_unlock)
             else:
                 unlock = None
-                
-            to_append = Assignment(
+            assignment_obj = Assignment(
                 user_id=user_id,
                 course_id=course_id,
                 title=assignment['name'],
@@ -144,14 +131,53 @@ class CanvasClient:
                 html_url=assignment['html_url'],
                 submission_type=json.dumps(assignment.get('submission_types')),
                 canvas_base_url=self.base_url,
-                last_canvas_sync=datetime.now(timezone.utc).isoformat()
+                last_canvas_sync=datetime.now(timezone.utc)
             )
-            assignment_list.append(to_append)
-            print("Appended assignment")
+            if due > today + timedelta(days=21):
+                continue_page = False
+                print("Due date exceeded 21 days, stopping page continuation")
+                continue
+            
+            assignments_list.append(assignment_obj)
+            
+        print("Assignment created")
+        return assignments_list, continue_page
+    
+    def getAssignmentsByCourse(self, user_id: int, course: Course):
+        state = course.workflow_state
+        end_at = course.end_at
+        today = date.today().isoformat()
+        print(f"Course Object: {course}")
+        if state not in ("available", "active", "published"):
+            print("Course unavailable")
+            return None
+        if end_at:
+            if today > end_at:
+                print("Course expired")
+                return None
+        canvas_course_id = str(course.canvas_course_id)
+        course_id = course.course_id
+        request_url = self.base_url + "courses/" + canvas_course_id + "/assignments/"
+        print(f"Fetching assignment for {course}")
+        resp = requests.get(request_url, params={"access_token": self.token, "per_page": 50})
+        assignments_list = []
+        # while loop for parsing response to assignment -> next page
+        while resp:
+            assignments =  resp.json()
+            assignments, continue_page = self._create_assignment_list(user_id=user_id,
+                                                                    course_id=course_id,
+                                                                    canvas_course_id=canvas_course_id,
+                                                                    assignments=assignments)
+            print(f"Assignment Object obtained")
+            assignments_list.extend(assignments)
+            next_link = resp.links.get("next")
+            if continue_page is False or not next_link:
+                break 
+            resp = requests.get(next_link["url"])
         
-        if len(assignment_list) > 0:
+        if len(assignments_list) > 0:
             print(f"Returned assignment list for {course}")
-            return assignment_list 
+            return assignments_list 
         else:
             print(f"Returned None for {course}")
             return None
