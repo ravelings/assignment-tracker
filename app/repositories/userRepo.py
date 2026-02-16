@@ -43,6 +43,16 @@ class UserRepo:
         else:
             return None
 
+    def set_refresh_token(self, user_id, refresh_token):
+        user = User.query.filter_by(user_id=user_id)
+        user.osmo_refresh_token = refresh_token
+        self.commit()
+        
+    def set_token(self, user_id, token):
+        user = User.query.filter_by(user_id=user_id)
+        user.osmo_token = token
+        self.commit()
+
     def getGoogleUser(self, iss, sub):
         return (User.query.filter_by(iss=iss, sub=sub).one_or_none())
 

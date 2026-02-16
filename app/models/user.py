@@ -22,6 +22,9 @@ class User(UserMixin, db.Model):
     
     canvas_instance = db.Column("canvas_instance", db.String(255), nullable=True)
 
+    osmo_token = db.Column("osmo_token", db.String(255), nullable=True)
+    osmo_refresh_token = db.Column("osmo_refresh_token", db.String(255), nullable=True)
+
     def __init__(self, username=None, hash=None, iss=None, sub=None):
         self.username = username
         self.hash = hash
