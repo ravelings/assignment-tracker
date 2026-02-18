@@ -122,7 +122,7 @@ def register():
             
             if user is not None:
                 print("User created")
-                return redirect(url_for("login.home"))
+                return redirect(url_for("login.login"))
             else:
                 print("User not created")
                 return redirect(url_for("login.register"))
