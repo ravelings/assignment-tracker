@@ -4,10 +4,10 @@ class Course(db.Model):
     __tablename__ = "courses"
 
     assignments = db.relationship("Assignment", 
-                                  back_populates="course",
-                                  foreign_keys="Assignment.course_id",
-                                  primaryjoin = "Course.course_id == Assignment.course_id"
-                                  )
+                                back_populates="course",
+                                foreign_keys="Assignment.course_id",
+                                primaryjoin = "Course.course_id == Assignment.course_id"
+                                )
 
     course_id = db.Column(
         "course_id",
