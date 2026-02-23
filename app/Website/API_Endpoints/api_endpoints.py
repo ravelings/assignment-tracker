@@ -36,8 +36,9 @@ def login():
     
     userRepo = UserRepo()
     user = userRepo.getUserByName(username)
-    access_token = create_access_token(identity=user.user_id)
-    refresh_token = create_refresh_token(identity=user.user_id)
+    user_id_string = str(user.user_id)
+    access_token = create_access_token(identity=user_id_string)
+    refresh_token = create_refresh_token(identity=user_id_string)
     print(f"Returned: access token: {access_token}, refresh_token: {refresh_token}")
     
     return jsonify(access_token=access_token, refresh_token=refresh_token)
