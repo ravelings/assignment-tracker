@@ -1,5 +1,6 @@
 from datetime import timedelta
-from flask import Flask
+from flask import Flask, jsonify
+from flask_jwt_extended import JWTManager
 import os
 from dotenv import load_dotenv
 from extensions.extensions import db, loginManager
@@ -10,12 +11,29 @@ from Website.Courses.courseManager import courses_bp
 from Website.Scores.scoreManager import scores_bp
 from Website.Settings.settings import settings_bp
 from Website.Calendar.calendar import calendar_bp
+from Website.API_Endpoints.api_endpoints import api_bp
 
 load_dotenv()
 
 app = Flask(__name__)
 ## app configs
 app.config["REMEMBER_COOKIE_DURATION"] = timedelta(weeks=1)
+## JWT Config
+# JWT config
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
+jwt = JWTManager(app)
+@jwt.expired_token_loader
+def handle_expired(jwt_header, jwt_payload):
+    print("Token expired")
+    return (
+        jsonify({
+            "error": "access_token expired",
+            "expired_at": jwt_payload["exp"],
+        }),
+        401,
+    )
 ## DB config
 
 # app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
@@ -42,6 +60,8 @@ app.register_blueprint(calendar_bp, url_prefix="")
 app.register_blueprint(scores_bp, url_prefix="/dashboard/")
 ## settings
 app.register_blueprint(settings_bp, url_prefix="")
+## API
+app.register_blueprint(api_bp, url_prefix="/api/v1")
 # secret
 app.secret_key = os.getenv("secret")
 
