@@ -9,6 +9,7 @@ Flask-SQLAlchemy
 psycopg2-binary
 Flask-WTF
 WTForms
+flask-jwt-extended
 ## Google API
 google-api-python-client
 google-cloud-recaptcha-enterprise
